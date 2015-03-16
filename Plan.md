@@ -7,4 +7,3 @@
 3   |Interval       |Interval van loggen toevoegen en zelf laten berekenen
 4   |Naar Computer  |Gegevens weergeven in een programma op de PC
 5   |Grafiek        |Gelogde gevevens weergeven in een grafiek
-hallo
