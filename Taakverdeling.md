@@ -1,6 +1,6 @@
 # Taakverdeling
 
 Taak                          |Persoon
-:-----------------------------|:-------
-Arduino/Shrimp programmeren   |?
-Windows programma schrijven   |?
+:-----------------------------|:-------------
+Arduino/Shrimp programmeren   |Philip
+Windows programma schrijven   |Joël en Wouter
