@@ -6,11 +6,14 @@
 //
 //
 
+#include "Arduino.h"
+
 // Include temperature and humidity sensor library
 #include <dht11.h>
 // Include libraries for database
 #include <EEPROM.h>
 #include <DB.h>
+#include <String.h>
 
 #define TABLE 1
 
@@ -23,6 +26,7 @@ dht11 DHT11;
 DB db;
 int travelTime = 0; // Total travel time in s
 int logInterval = 0; // Hoe vaak willen we loggen?
+String msg;
 struct MyRec {
   int humidity;
   double temperature;
@@ -41,13 +45,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int chk = DHT11.read();
-//  switch (chk) {
-//    case 0: Serial.println("OK"); break;
-//    case -1: Serial.println("Checksum error"); break;
-//    case -2: Serial.println("Time out error"); break;
-//    default: Serial.println("Unknown error"); break;
-//  }
+  if (Serial.available()) {
+   msg = (String) Serial.read();
+   if (msg == "View data") selectAll();
+  }
+  
   
 //  Serial.print("Humidity (%): ");
 //  Serial.println((int)DHT11.humidity, DEC);
@@ -58,7 +60,7 @@ void loop() {
   myrec.temperature = (double) DHT11.temperature;
   
   db.append(DB_REC myrec);
-  selectAll();
+  //selectAll();
   delay(2000);
 }
 
