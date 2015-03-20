@@ -1,26 +1,39 @@
+#include <dht11.h>
+
 // Pins
 const int ledPin = 13;
-const int buttonPin = 2;
-const int thermometerPin = A0;
+const int dhc11Pin = 8;
+
 
 // Variables
+dht11 DHT11;
 int travelTime = 0; // Total travel time in s
 int logInterval = 0; // Hoe vaak willen we loggen?
-int temperature = 0;
 
 void setup() {
   // Initialize pins
   pinMode(ledPin, OUTPUT);
   
+  DHT11.attach(dhc11Pin);
   Serial.begin(9600);
-  digitalWrite(ledPin, LOW);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  temperature = analogRead(thermometerPin);
-  Serial.println(temperature, DEC);
-  delay(1);
+  int chk = DHT11.read();
+  switch (chk)
+  {
+    case 0: Serial.println("OK"); break;
+    case -1: Serial.println("Checksum error"); break;
+    case -2: Serial.println("Time out error"); break;
+    default: Serial.println("Unknown error"); break;
+  }
   
+  Serial.print("Humidity (%): ");
+  Serial.println((int)DHT11.humidity, DEC);
   
+  Serial.print("Temperature (°C): ");
+  Serial.println((float)DHT11.temperature, DEC);
+  
+  delay(2000);
 }
