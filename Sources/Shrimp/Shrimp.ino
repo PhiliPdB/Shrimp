@@ -19,14 +19,18 @@
 
 // Pins
 const int ledPin = 13;
-const int dhc11Pin = 8;
+const int dht11Pin = 8;
+
+// Variables to use for the interval
+unsigned long previousMillis = 0;
+long logInterval = 0; // Hoe vaak willen we loggen?
 
 // Variables
 dht11 DHT11;
 DB db;
 int travelTime = 0; // Total travel time in s
-int logInterval = 0; // Hoe vaak willen we loggen?
 String msg;
+boolean logData = true;
 struct MyRec {
   int humidity;
   double temperature;
@@ -36,7 +40,9 @@ void setup() {
   // Initialize pins
   pinMode(ledPin, OUTPUT);
   
-  DHT11.attach(dhc11Pin);
+  logInterval = 2000;
+  
+  DHT11.attach(dht11Pin);
   Serial.begin(9600);
   
   db.create(TABLE, sizeof(myrec));
@@ -44,30 +50,44 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if (Serial.available()) {
-   msg = (String) Serial.read();
-   if (msg == "View data") selectAll();
-  }
+   // put your main code here, to run repeatedly:
+   while (Serial.available() > 0) {
+     char recieved = Serial.read();
+     msg += recieved;
+     
+     if (msg == "viewData") selectAll();
+     else if (msg == "stopLogging") logData = false;
+   }
   
+   unsigned long currentMillis = millis();
   
-//  Serial.print("Humidity (%): ");
-//  Serial.println((int)DHT11.humidity, DEC);
-  myrec.humidity = (int) DHT11.humidity;
-  
-//  Serial.print("Temperature (°C): ");
-//  Serial.println((double)DHT11.temperature, DEC);
-  myrec.temperature = (double) DHT11.temperature;
-  
-  db.append(DB_REC myrec);
+   if(currentMillis - previousMillis >= logInterval && logData) {
+      previousMillis = currentMillis;
+      
+      int chk = DHT11.read();
+//      switch (chk) {
+//         case 0: Serial.println("OK"); break;
+//         case -1: Serial.println("Checksum error"); break;
+//         case -2: Serial.println("Time out error"); break;
+//         default: Serial.println("Unknown error"); break;
+//      }
+    
+//      Serial.print("Humidity (%): ");
+//      Serial.println((int) DHT11.humidity, DEC);
+      myrec.humidity = (int) DHT11.humidity;
+    
+//      Serial.print("Temperature (°C): ");
+//      Serial.println((double) DHT11.temperature, DEC);
+      myrec.temperature = (double) DHT11.temperature;
+    
+      db.append(DB_REC myrec);
+   }
   //selectAll();
-  delay(2000);
 }
 
 void selectAll() {
   if (db.nRecs()) Serial.println("-----");
-  for (int i = 1; i <= db.nRecs(); i++)
-  {
+  for (int i = 1; i <= db.nRecs(); i++) {
     db.read(i, DB_REC myrec);
     Serial.print("Recnum: "); Serial.println(i); 
     Serial.print("Humidity: "); Serial.println(myrec.humidity);
