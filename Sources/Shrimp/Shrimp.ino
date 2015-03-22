@@ -57,6 +57,7 @@ void loop() {
      
      if (msg == "viewData") selectAll();
      else if (msg == "stopLogging") logData = false;
+     else if (msg == "setTravelTime") setTravelTime();
    }
   
    unsigned long currentMillis = millis();
@@ -64,23 +65,7 @@ void loop() {
    if(currentMillis - previousMillis >= logInterval && logData) {
       previousMillis = currentMillis;
       
-      int chk = DHT11.read();
-//      switch (chk) {
-//         case 0: Serial.println("OK"); break;
-//         case -1: Serial.println("Checksum error"); break;
-//         case -2: Serial.println("Time out error"); break;
-//         default: Serial.println("Unknown error"); break;
-//      }
-    
-//      Serial.print("Humidity (%): ");
-//      Serial.println((int) DHT11.humidity, DEC);
-      myrec.humidity = (int) DHT11.humidity;
-    
-//      Serial.print("Temperature (°C): ");
-//      Serial.println((double) DHT11.temperature, DEC);
-      myrec.temperature = (double) DHT11.temperature;
-    
-      db.append(DB_REC myrec);
+      readDHT11();
    }
   //selectAll();
 }
@@ -94,4 +79,31 @@ void selectAll() {
     Serial.print("Temperature: "); Serial.println(myrec.temperature);
     Serial.println("-----");  
   } 
+}
+
+void setTravelTime() {
+    while (Serial.available() == 0) { }
+    
+    int input = Serial.parseInt();
+    travelTime = input;
+}
+
+void readDHT11() {
+    int chk = DHT11.read();
+    switch (chk) {
+        case 0: Serial.println("OK"); break;
+        case -1: Serial.println("Checksum error"); break;
+        case -2: Serial.println("Time out error"); break;
+        default: Serial.println("Unknown error"); break;
+     }
+    
+//      Serial.print("Humidity (%): ");
+//      Serial.println((int) DHT11.humidity, DEC);
+      myrec.humidity = (int) DHT11.humidity;
+    
+//      Serial.print("Temperature (°C): ");
+//      Serial.println((double) DHT11.temperature, DEC);
+      myrec.temperature = (double) DHT11.temperature;
+    
+      db.append(DB_REC myrec);
 }
