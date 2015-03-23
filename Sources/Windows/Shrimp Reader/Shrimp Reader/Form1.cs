@@ -13,6 +13,7 @@ namespace Shrimp_Reader {
     public partial class Form1 : Form {
         private SerialPort myport;
         private DateTime datetime;
+        private string in_data;
         public Form1() {
             InitializeComponent();
         }
@@ -38,12 +39,22 @@ namespace Shrimp_Reader {
         }
 
         void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
-            datetime = DateTime.Now;
+            
 
+           in_data = myport.ReadLine();
+
+            this.Invoke(new EventHandler(displaydata_event));
+
+            
+
+
+        }
+
+
+        private void displaydata_event(object sender, EventArgs e) {
+           datetime = DateTime.Now; 
             string time = datetime.Hour + ":"+datetime.Minute+":"+datetime.Second;
-            string in_data = myport.ReadLine();
             data_tb.Text = time+"\t\t\t\t\tt"+in_data;
-
         }
     }
 }
