@@ -18,6 +18,12 @@ namespace Shrimp_Reader {
 
         public Form1() {
             InitializeComponent();
+            this.Load += Form1_Load;
+        }
+
+        void Form1_Load(object sender, EventArgs e) {
+            var ports = SerialPort.GetPortNames();
+            port_name_cb.DataSource = ports;
         }
 
         private void Form1_Click(object sender, EventArgs e) {
@@ -27,7 +33,7 @@ namespace Shrimp_Reader {
         private void start_btn_Click(object sender, EventArgs e) {
             myport = new SerialPort();
             myport.BaudRate = 9600;
-            myport.PortName = port_name_tb.Text;
+            myport.PortName = port_name_cb.SelectedItem.ToString();
             myport.Parity = Parity.None;
             myport.DataBits = 8;
             myport.StopBits = StopBits.One;
@@ -41,17 +47,11 @@ namespace Shrimp_Reader {
         }
 
         void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
-            
-
+           
            in_data = myport.ReadLine();
 
-            this.Invoke(new EventHandler(displaydata_event));
-
-            
-
-
+           this.Invoke(new EventHandler(displaydata_event));
         }
-
 
         private void displaydata_event(object sender, EventArgs e) {
            datetime = DateTime.Now; 

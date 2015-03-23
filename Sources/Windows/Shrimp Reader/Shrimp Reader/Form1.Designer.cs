@@ -32,12 +32,12 @@
             this.stop_btn = new System.Windows.Forms.Button();
             this.save_btn = new System.Windows.Forms.Button();
             this.data_tb = new System.Windows.Forms.TextBox();
-            this.port_name_tb = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.value_pb = new System.Windows.Forms.ProgressBar();
+            this.port_name_cb = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // start_btn
@@ -76,14 +76,6 @@
             this.data_tb.Name = "data_tb";
             this.data_tb.Size = new System.Drawing.Size(275, 293);
             this.data_tb.TabIndex = 3;
-            // 
-            // port_name_tb
-            // 
-            this.port_name_tb.Location = new System.Drawing.Point(419, 31);
-            this.port_name_tb.Multiline = true;
-            this.port_name_tb.Name = "port_name_tb";
-            this.port_name_tb.Size = new System.Drawing.Size(136, 20);
-            this.port_name_tb.TabIndex = 4;
             // 
             // label1
             // 
@@ -128,17 +120,26 @@
             this.value_pb.Size = new System.Drawing.Size(275, 23);
             this.value_pb.TabIndex = 9;
             // 
+            // port_name_cb
+            // 
+            this.port_name_cb.FormattingEnabled = true;
+            this.port_name_cb.Location = new System.Drawing.Point(419, 31);
+            this.port_name_cb.Name = "port_name_cb";
+            this.port_name_cb.Size = new System.Drawing.Size(136, 21);
+            this.port_name_cb.TabIndex = 10;
+            this.port_name_cb.Text = "Select port";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(619, 435);
+            this.Controls.Add(this.port_name_cb);
             this.Controls.Add(this.value_pb);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.port_name_tb);
             this.Controls.Add(this.data_tb);
             this.Controls.Add(this.save_btn);
             this.Controls.Add(this.stop_btn);
@@ -157,12 +158,12 @@
         private System.Windows.Forms.Button stop_btn;
         private System.Windows.Forms.Button save_btn;
         private System.Windows.Forms.TextBox data_tb;
-        private System.Windows.Forms.TextBox port_name_tb;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ProgressBar value_pb;
+        private System.Windows.Forms.ComboBox port_name_cb;
     }
 }
 
