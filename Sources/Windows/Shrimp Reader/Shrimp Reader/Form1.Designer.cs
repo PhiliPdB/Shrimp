@@ -42,7 +42,7 @@
             // 
             // start_btn
             // 
-            this.start_btn.Location = new System.Drawing.Point(419, 86);
+            this.start_btn.Location = new System.Drawing.Point(419, 191);
             this.start_btn.Name = "start_btn";
             this.start_btn.Size = new System.Drawing.Size(136, 45);
             this.start_btn.TabIndex = 0;
@@ -52,16 +52,17 @@
             // 
             // stop_btn
             // 
-            this.stop_btn.Location = new System.Drawing.Point(419, 137);
+            this.stop_btn.Location = new System.Drawing.Point(419, 242);
             this.stop_btn.Name = "stop_btn";
             this.stop_btn.Size = new System.Drawing.Size(136, 45);
             this.stop_btn.TabIndex = 1;
             this.stop_btn.Text = "Stop";
             this.stop_btn.UseVisualStyleBackColor = true;
+            this.stop_btn.Click += new System.EventHandler(this.stop_btn_click);
             // 
             // save_btn
             // 
-            this.save_btn.Location = new System.Drawing.Point(419, 188);
+            this.save_btn.Location = new System.Drawing.Point(419, 293);
             this.save_btn.Name = "save_btn";
             this.save_btn.Size = new System.Drawing.Size(136, 45);
             this.save_btn.TabIndex = 2;
@@ -73,7 +74,7 @@
             this.data_tb.Location = new System.Drawing.Point(36, 45);
             this.data_tb.Multiline = true;
             this.data_tb.Name = "data_tb";
-            this.data_tb.Size = new System.Drawing.Size(275, 252);
+            this.data_tb.Size = new System.Drawing.Size(275, 293);
             this.data_tb.TabIndex = 3;
             // 
             // port_name_tb
@@ -87,44 +88,44 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(536, 370);
+            this.label1.Location = new System.Drawing.Point(280, 370);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(19, 13);
+            this.label1.Size = new System.Drawing.Size(31, 13);
             this.label1.TabIndex = 5;
-            this.label1.Text = "50";
+            this.label1.Text = "1023";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(33, 29);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(34, 13);
+            this.label2.Size = new System.Drawing.Size(39, 13);
             this.label2.TabIndex = 6;
-            this.label2.Text = "Value";
+            this.label2.Text = "Output";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(33, 370);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(22, 13);
+            this.label3.Size = new System.Drawing.Size(13, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "-50";
+            this.label3.Text = "0";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(322, 31);
+            this.label4.Location = new System.Drawing.Point(358, 34);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(54, 13);
+            this.label4.Size = new System.Drawing.Size(55, 13);
             this.label4.TabIndex = 8;
-            this.label4.Text = "port name";
+            this.label4.Text = "Port name";
             // 
             // value_pb
             // 
             this.value_pb.Location = new System.Drawing.Point(36, 344);
             this.value_pb.Name = "value_pb";
-            this.value_pb.Size = new System.Drawing.Size(519, 23);
+            this.value_pb.Size = new System.Drawing.Size(275, 23);
             this.value_pb.TabIndex = 9;
             // 
             // Form1
@@ -143,7 +144,7 @@
             this.Controls.Add(this.stop_btn);
             this.Controls.Add(this.start_btn);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Shrimp Reader";
             this.Click += new System.EventHandler(this.Form1_Click);
             this.ResumeLayout(false);
             this.PerformLayout();
