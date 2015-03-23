@@ -23,42 +23,69 @@ const int dht11Pin = 8;
 
 // Variables to use for the interval
 unsigned long previousMillis = 0;
-long logInterval = 0; // Hoe vaak willen we loggen?
+long logInterval = 2000;
 
 // Variables
 dht11 DHT11;
 DB db;
-int travelTime = 0; // Total travel time in s
+int travelTime; // Total travel time in s
+int maxLogs = 255;
 String msg;
+boolean msgComplete = false;
 boolean logData = true;
+
 struct MyRec {
   int humidity;
   double temperature;
 } myrec;
 
+int avgHumidity;
+int avgTemp;
+
 void setup() {
   // Initialize pins
   pinMode(ledPin, OUTPUT);
   
-  logInterval = 2000;
+  if (logInterval == 0) logData = false;
   
   DHT11.attach(dht11Pin);
   Serial.begin(9600);
+  while (!Serial) { }
+  Serial.println("Type a command");
   
   db.create(TABLE, sizeof(myrec));
   db.open(TABLE);
 }
 
-void loop() {
-   // put your main code here, to run repeatedly:
-   while (Serial.available() > 0) {
+void serialEvent() {
+    while (Serial.available()) {
      char recieved = Serial.read();
      msg += recieved;
      
-     if (msg == "viewData") selectAll();
-     else if (msg == "stopLogging") logData = false;
-     else if (msg == "setTravelTime") setTravelTime();
+     if (recieved == '\n') msgComplete = true;
+     
+     if (msgComplete) {
+         if (msg == "viewData") selectAll();
+         else if (msg == "stopLogging") {
+             Serial.println("Stopping with logging data");
+             logData = false;
+         } else if (msg == "setTravelTime") setTravelTime();
+     }
    }
+}
+
+void loop() {
+   // put your main code here, to run repeatedly:
+//   while (Serial.available() > 0) {
+//     char recieved = Serial.read();
+//     msg += recieved;
+//     
+//     if (msg == "viewData") selectAll();
+//     else if (msg == "stopLogging") {
+//         Serial.println("Stopping with logging data");
+//         logData = false;
+//     } else if (msg == "setTravelTime") setTravelTime();
+//   }
   
    unsigned long currentMillis = millis();
   
@@ -67,7 +94,6 @@ void loop() {
       
       readDHT11();
    }
-  //selectAll();
 }
 
 void selectAll() {
@@ -82,20 +108,27 @@ void selectAll() {
 }
 
 void setTravelTime() {
+    Serial.println("set travel time in sec");
     while (Serial.available() == 0) { }
     
     int input = Serial.parseInt();
     travelTime = input;
+    setLogInterval();
+}
+
+void setLogInterval() {
+    logInterval = (travelTime * 1000) / maxLogs;
+    logData = true;
 }
 
 void readDHT11() {
     int chk = DHT11.read();
-    switch (chk) {
-        case 0: Serial.println("OK"); break;
-        case -1: Serial.println("Checksum error"); break;
-        case -2: Serial.println("Time out error"); break;
-        default: Serial.println("Unknown error"); break;
-     }
+//    switch (chk) {
+//        case 0: Serial.println("OK"); break;
+//        case -1: Serial.println("Checksum error"); break;
+//        case -2: Serial.println("Time out error"); break;
+//        default: Serial.println("Unknown error"); break;
+//     }
     
 //      Serial.print("Humidity (%): ");
 //      Serial.println((int) DHT11.humidity, DEC);
@@ -106,4 +139,17 @@ void readDHT11() {
       myrec.temperature = (double) DHT11.temperature;
     
       db.append(DB_REC myrec);
+}
+
+void calcAvgHumidity() {
+    int totalHumidity = 0;
+    int cases = 0;
+    if (db.nRecs()) {
+        for (int i = 1; i <= db.nRecs(); i++) {
+            db.read(i, DB_REC myrec);
+            totalHumidity += myrec.humidity;
+            cases++;
+        }
+        avgHumidity = totalHumidity / cases;
+    }
 }
