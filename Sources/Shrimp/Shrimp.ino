@@ -63,11 +63,18 @@ void loop() {
         else msgComplete = true;
 
         if (msgComplete) {
-            if (msg == "viewData") selectAll();
+            if (msg == "viewData") readData();
             else if (msg == "stopLogging") {
                 Serial.println("Stopping with logging data");
                 logData = false;
             } else if (msg == "setTravelTime") setTravelTime();
+            else if (msg == "viewAvgHumidity") {
+                calcAvgHumidity();
+                Serial.println(avgHumidity);
+            } else if (msg == "viewAvgTemp") {
+                calcAvgTemp();
+                Serial.println(avgTemp);
+            } else if (msg == "clearData") clearData();
             
             msg = "";
             msgComplete = false;
@@ -84,7 +91,7 @@ void loop() {
     }
 }
 
-void selectAll() {
+void readData() {
   if (db.nRecs()) Serial.println("-----");
   for (int i = 1; i <= db.nRecs(); i++) {
     db.read(i, DB_REC myrec);
@@ -93,6 +100,12 @@ void selectAll() {
     Serial.print("Temperature: "); Serial.println(myrec.temperature);
     Serial.println("-----");  
   } 
+}
+
+void clearData() {
+    for (int i = 0; i <= db.nRecs(); i++) {
+        db.deleteRec(i);
+    }
 }
 
 void setTravelTime() {
