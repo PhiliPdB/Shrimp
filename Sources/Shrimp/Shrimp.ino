@@ -31,7 +31,6 @@ DB db;
 int travelTime; // Total travel time in s
 int maxLogs = 255;
 String msg;
-boolean msgComplete = false;
 boolean logData = true;
 
 struct MyRec {
@@ -50,50 +49,39 @@ void setup() {
   
   DHT11.attach(dht11Pin);
   Serial.begin(9600);
-  while (!Serial) { }
-  Serial.println("Type a command");
   
   db.create(TABLE, sizeof(myrec));
   db.open(TABLE);
 }
 
-void serialEvent() {
-    while (Serial.available()) {
-     char recieved = Serial.read();
-     msg += recieved;
-     
-     if (recieved == '\n') msgComplete = true;
-     
-     if (msgComplete) {
-         if (msg == "viewData") selectAll();
-         else if (msg == "stopLogging") {
-             Serial.println("Stopping with logging data");
-             logData = false;
-         } else if (msg == "setTravelTime") setTravelTime();
-     }
-   }
-}
-
 void loop() {
-   // put your main code here, to run repeatedly:
-//   while (Serial.available() > 0) {
-//     char recieved = Serial.read();
-//     msg += recieved;
-//     
-//     if (msg == "viewData") selectAll();
-//     else if (msg == "stopLogging") {
-//         Serial.println("Stopping with logging data");
-//         logData = false;
-//     } else if (msg == "setTravelTime") setTravelTime();
-//   }
+    // put your main code here, to run repeatedly:
+    while (Serial.available()) {
+        boolean msgComplete = false;
+        char recieved = Serial.read();
+        if (recieved != '\n') msg += recieved;       
+        else msgComplete = true;
+
+        if (msgComplete) {
+            if (msg == "viewData") selectAll();
+            else if (msg == "stopLogging") {
+                Serial.println("Stopping with logging data");
+                logData = false;
+            } else if (msg == "setTravelTime") setTravelTime();
+            
+            msg = "";
+            msgComplete = false;
+        }
+    }
+    //if (Serial.available() == 0) msg = "";
   
-   unsigned long currentMillis = millis();
+    unsigned long currentMillis = millis();
   
-   if(currentMillis - previousMillis >= logInterval && logData) {
-      previousMillis = currentMillis;
+    if(currentMillis - previousMillis >= logInterval && logData) {
+        previousMillis = currentMillis;
       
-      readDHT11();
-   }
+        readDHT11();
+    }
 }
 
 void selectAll() {
@@ -151,5 +139,18 @@ void calcAvgHumidity() {
             cases++;
         }
         avgHumidity = totalHumidity / cases;
+    }
+}
+
+void calcAvgTemp() {
+    int totalTemp = 0;
+    int cases = 0;
+    if (db.nRecs()) {
+        for (int i = 1; i <= db.nRecs(); i++) {
+            db.read(i, DB_REC myrec);
+            totalTemp += myrec.temperature;
+            cases++;
+        }
+        avgTemp = totalTemp / cases;
     }
 }
