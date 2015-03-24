@@ -57,7 +57,7 @@ namespace Shrimp_Reader {
         }
 
         private void displaydata_event(object sender, EventArgs e) {
-           datetime = DateTime.Now; 
+            datetime = DateTime.Now; 
             string time = datetime.Hour + ":"+datetime.Minute+":"+datetime.Second;
             data_tb.AppendText(time + "\t" + in_data + "\n");
         }
