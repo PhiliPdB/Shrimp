@@ -32,6 +32,7 @@ namespace Shrimp_Reader {
         }
 
         private void start_btn_Click(object sender, EventArgs e) {
+            // Configure serial port
             myport = new SerialPort();
             myport.BaudRate = 9600;
             myport.PortName = port;
@@ -39,6 +40,7 @@ namespace Shrimp_Reader {
             myport.DataBits = 8;
             myport.StopBits = StopBits.One;
             myport.DataReceived += myport_DataReceived;
+            // Try to open the port
             try {
                 myport.Open();
                 myport.WriteLine("viewData");
@@ -97,6 +99,7 @@ namespace Shrimp_Reader {
             }
         }
 
+        // Prompt for port dialog
         public static class PromptPort {
             public static string ShowDialog(string text, string caption) {
                 Form prompt = new Form();
@@ -117,7 +120,7 @@ namespace Shrimp_Reader {
 
                 var ports = SerialPort.GetPortNames();
                 comboBox.DataSource = ports;
-
+                // Add the objects
                 prompt.Controls.Add(comboBox);
                 prompt.Controls.Add(confirmation);
                 prompt.Controls.Add(exit);
