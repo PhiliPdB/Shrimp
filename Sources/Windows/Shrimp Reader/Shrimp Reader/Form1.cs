@@ -13,10 +13,9 @@ using System.IO;
 namespace Shrimp_Reader {
     public partial class Form1 : Form {
 
-        private SerialPort myport;
-        private DateTime datetime;
-        private string in_data;
-        private static string port;
+        private SerialPort myport;      // Serial port
+        private string in_data;         // Data in save string
+        private static string port;     // Serial port name
 
         public Form1() {
             InitializeComponent();
@@ -24,6 +23,7 @@ namespace Shrimp_Reader {
         }
 
         void Form1_Load(object sender, EventArgs e) {
+            // Ask the port of the arduino
             port = PromptPort.ShowDialog("Please select a port", "Port");
         }
 
@@ -59,9 +59,7 @@ namespace Shrimp_Reader {
         }
 
         private void displaydata_event(object sender, EventArgs e) {
-            datetime = DateTime.Now; 
-            string time = datetime.Hour + ":"+datetime.Minute+":"+datetime.Second;
-            data_tb.AppendText(time + "\t" + in_data + "\n");
+            data_tb.AppendText(in_data + "\n");
         }
 
         private void stop_btn_click(object sender, EventArgs e) {
@@ -108,16 +106,18 @@ namespace Shrimp_Reader {
                 prompt.FormBorderStyle = FormBorderStyle.FixedDialog;
                 prompt.Text = caption;
                 prompt.StartPosition = FormStartPosition.CenterScreen;
+                // Design elements
                 Label textLabel = new Label() { Left = 25, Top = 20, Text = text };
                 ComboBox comboBox = new ComboBox() { Left = 125, Top = 20, Width = 136 };
                 Button confirmation = new Button() { Text = "Ok", Left = 161, Width = 100, Top = 70 };
                 Button exit = new Button() { Text = "Exit", Left = 25, Width = 100, Top = 70 };
+                // Set click events
                 confirmation.Click += (sender, e) => {
                     prompt.Close();
                     if (comboBox.Text.ToString() == "") Form1.port = PromptPort.ShowDialog("Please select a port", "Port");
                 };
                 exit.Click += (sender, e) => { Application.Exit(); };
-
+                // Load all available ports
                 var ports = SerialPort.GetPortNames();
                 comboBox.DataSource = ports;
                 // Add the objects
@@ -130,7 +130,7 @@ namespace Shrimp_Reader {
                 prompt.ControlBox = false;
                 prompt.ShowDialog();
 
-                return comboBox.Text.ToString();
+                return comboBox.Text.ToString(); // Return the name of the selected port
             }
         }
     }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.start_btn = new System.Windows.Forms.Button();
             this.stop_btn = new System.Windows.Forms.Button();
             this.save_btn = new System.Windows.Forms.Button();
@@ -93,6 +94,7 @@
             this.Controls.Add(this.save_btn);
             this.Controls.Add(this.stop_btn);
             this.Controls.Add(this.start_btn);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Shrimp Reader";
             this.Click += new System.EventHandler(this.Form1_Click);
