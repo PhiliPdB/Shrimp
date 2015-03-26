@@ -23,15 +23,12 @@ namespace Shrimp_Reader {
         }
 
         void Form1_Load(object sender, EventArgs e) {
+            Select_Port();
+        }
+
+        private void Select_Port() {
             // Ask the port of the arduino
             port = PromptPort.ShowDialog("Please select a port", "Port");
-        }
-
-        private void Form1_Click(object sender, EventArgs e) {
-
-        }
-
-        private void start_btn_Click(object sender, EventArgs e) {
             // Configure serial port
             myport = new SerialPort();
             myport.BaudRate = 9600;
@@ -40,9 +37,27 @@ namespace Shrimp_Reader {
             myport.DataBits = 8;
             myport.StopBits = StopBits.One;
             myport.DataReceived += myport_DataReceived;
-            // Try to open the port
             try {
                 myport.Open();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Error");
+            }
+        }
+
+        private void Form1_Click(object sender, EventArgs e) {
+
+        }
+
+        private void start_btn_Click(object sender, EventArgs e) {
+            if (!myport.IsOpen) {
+                try {
+                    myport.Open();
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, "Error");
+                }
+            }
+
+            try {
                 myport.WriteLine("viewData");
                 data_tb.Text = "";
             } catch(Exception ex) {
@@ -114,7 +129,7 @@ namespace Shrimp_Reader {
                 // Set click events
                 confirmation.Click += (sender, e) => {
                     prompt.Close();
-                    if (comboBox.Text.ToString() == "") Form1.port = PromptPort.ShowDialog("Please select a port", "Port");
+                    if (comboBox.Text.ToString() == "") port = PromptPort.ShowDialog("Please select a port", "Port"); ;
                 };
                 exit.Click += (sender, e) => { Application.Exit(); };
                 // Load all available ports

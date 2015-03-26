@@ -29,13 +29,14 @@ long logInterval = 2000;
 dht11 DHT11;
 DB db;
 int travelTime; // Total travel time in s
+int logs = 0;
 int maxLogs = 255;
 String msg;
 boolean logData = true;
 
 struct MyRec {
   int humidity;
-  double temperature;
+  int temperature;
 } myrec;
 
 int avgHumidity;
@@ -75,6 +76,10 @@ void loop() {
                 calcAvgTemp();
                 Serial.println(avgTemp);
             } else if (msg == "clearData") clearData();
+//            else if (msg == "viewTemp" && db.nRecs()) {
+//                int temp[db.nRecs()] = Temp();
+//                for (int i = 0; i < sizeof(temp) - 1; i++) Serial.println(temp[i]);
+//            }
             
             msg = "";
             msgComplete = false;
@@ -84,7 +89,7 @@ void loop() {
   
     unsigned long currentMillis = millis();
   
-    if(currentMillis - previousMillis >= logInterval && logData) {
+    if(currentMillis - previousMillis >= logInterval && logData && logs < 256) {
         previousMillis = currentMillis;
       
         readDHT11();
@@ -137,9 +142,10 @@ void readDHT11() {
     
 //      Serial.print("Temperature (°C): ");
 //      Serial.println((double) DHT11.temperature, DEC);
-      myrec.temperature = (double) DHT11.temperature;
+      myrec.temperature = (int) DHT11.temperature;
     
       db.append(DB_REC myrec);
+      logs++;
 }
 
 void calcAvgHumidity() {
@@ -165,5 +171,27 @@ void calcAvgTemp() {
             cases++;
         }
         avgTemp = totalTemp / cases;
+    }
+}
+
+int* Humi() {
+    if (db.nRecs()) {
+        int Humidity[db.nRecs()];
+        for (int i = 1; i <= db.nRecs(); i++) {
+            db.read(i, DB_REC myrec);
+            Humidity[i - 1] = myrec.humidity;
+        }
+        return Humidity;
+    }
+}
+
+int* Temp() {
+    if (db.nRecs()) {
+        int Temperature[db.nRecs()];
+        for (int i = 1; i <= db.nRecs(); i++) {
+            db.read(i, DB_REC myrec);
+            Temperature[i - 1] = myrec.temperature;
+        }
+        return Temperature;
     }
 }
