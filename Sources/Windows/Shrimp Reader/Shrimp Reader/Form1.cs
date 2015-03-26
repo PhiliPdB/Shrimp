@@ -13,9 +13,14 @@ using System.IO;
 namespace Shrimp_Reader {
     public partial class Form1 : Form {
 
-        private SerialPort myport;      // Serial port
-        private string in_data;         // Data in save string
-        private static string port;     // Serial port name
+        private SerialPort myport;                  // Serial port
+        private string in_data;                     // Data in save string
+        private static string port;                 // Serial port name
+        List<int> temperature = new List<int>();    // Temperatures over time
+        List<int> humidity = new List<int>();       // Humidities over time
+
+        private bool tempStarted = false;           // If temp logging is started the boolean is true
+        private bool humiStarted = false;           // Same as above, but for humidity
 
         public Form1() {
             InitializeComponent();
@@ -58,7 +63,8 @@ namespace Shrimp_Reader {
             }
 
             try {
-                myport.WriteLine("viewData");
+                myport.WriteLine("viewTemp");
+                myport.WriteLine("viewHumi");
                 data_tb.Text = "";
             } catch(Exception ex) {
                 MessageBox.Show(ex.Message,"Error");
@@ -66,11 +72,33 @@ namespace Shrimp_Reader {
             }
         }
 
-        void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
-           
-           in_data = myport.ReadLine();
+        public void init_Temp_Graph()
+        {
+            for (int i = 0; i < temperature.Count; i++)
+            {
+                Temp_Graph.Series["Series1"].Points.AddXY(i, temperature[i]);
+            }
+        }
+        
+        void getTemp(object sender, EventArgs e) {
+            string data = in_data.Replace("\r","");
+            
+            if (tempStarted && !humiStarted) temperature.Add(int.Parse(data));
 
-           this.Invoke(new EventHandler(displaydata_event));
+            if (data.Equals("Start")) tempStarted = true;
+            if (data.Equals("End")) tempStarted = false;
+
+            init_Temp_Graph();
+        }
+
+        void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
+            
+            in_data = myport.ReadLine();
+            
+            // Displays what the Shrimp sends
+            this.Invoke(new EventHandler(displaydata_event));
+            // Initialize the Temperature graph
+            this.Invoke(new EventHandler(getTemp));
         }
 
         private void displaydata_event(object sender, EventArgs e) {

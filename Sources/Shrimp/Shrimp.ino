@@ -76,10 +76,7 @@ void loop() {
                 calcAvgTemp();
                 Serial.println(avgTemp);
             } else if (msg == "clearData") clearData();
-//            else if (msg == "viewTemp" && db.nRecs()) {
-//                int temp[db.nRecs()] = Temp();
-//                for (int i = 0; i < sizeof(temp) - 1; i++) Serial.println(temp[i]);
-//            }
+            else if (msg == "viewTemp") Temp();
             
             msg = "";
             msgComplete = false;
@@ -174,24 +171,25 @@ void calcAvgTemp() {
     }
 }
 
-int* Humi() {
+void Humi() {
     if (db.nRecs()) {
-        int Humidity[db.nRecs()];
+        Serial.println(db.nRecs());
+        Serial.println("Start");
         for (int i = 1; i <= db.nRecs(); i++) {
             db.read(i, DB_REC myrec);
-            Humidity[i - 1] = myrec.humidity;
+            Serial.println(myrec.humidity);
         }
-        return Humidity;
+        Serial.println("End");
     }
 }
 
-int* Temp() {
+void Temp() {
     if (db.nRecs()) {
-        int Temperature[db.nRecs()];
+        Serial.println("Start");
         for (int i = 1; i <= db.nRecs(); i++) {
             db.read(i, DB_REC myrec);
-            Temperature[i - 1] = myrec.temperature;
+            Serial.println(myrec.temperature);
         }
-        return Temperature;
+        Serial.println("End");
     }
 }
