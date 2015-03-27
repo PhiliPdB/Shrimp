@@ -103,7 +103,7 @@
             this.Temp_Graph.Location = new System.Drawing.Point(417, 45);
             this.Temp_Graph.Name = "Temp_Graph";
             series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series1.Color = System.Drawing.Color.Red;
             series1.IsVisibleInLegend = false;
             series1.Name = "Series1";
@@ -123,7 +123,7 @@
             this.Humidity_Graph.Location = new System.Drawing.Point(12, 45);
             this.Humidity_Graph.Name = "Humidity_Graph";
             series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series2.Color = System.Drawing.Color.Blue;
             series2.IsVisibleInLegend = false;
             series2.Name = "Series1";

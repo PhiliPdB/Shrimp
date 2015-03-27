@@ -12,10 +12,11 @@
 #include <dht11.h>
 // Include libraries for database
 #include <EEPROM.h>
-#include <DB.h>
+#include <EDB.h>
 #include <String.h>
 
-#define TABLE 1
+#define TABLE_SIZE 1024
+#define RECORDS_TO_CREATE 252
 
 // Pins
 const int ledPin = 13;
@@ -23,16 +24,16 @@ const int dht11Pin = 8;
 
 // Variables to use for the interval
 unsigned long previousMillis = 0;
-long logInterval = 2000;
+unsigned long logDelay;                           // Log delay in milliseconds
+long logInterval = 0;                            // Log interval in milliseconds
 
 // Variables
 dht11 DHT11;
-DB db;
-int travelTime; // Total travel time in s
-int logs = 0;
-int maxLogs = 255;
+EDB db(&writer, &reader);
+long travelTime; // Total travel time in s
+int maxLogs = 252;
 String msg;
-boolean logData = true;
+boolean logData = false;
 
 struct MyRec {
   int humidity;
@@ -42,17 +43,31 @@ struct MyRec {
 int avgHumidity;
 int avgTemp;
 
+int addr = 0;
+
+// The read and write handlers for using the EEPROM Library
+void writer(unsigned long address, byte data) {
+    EEPROM.write(address, data);
+}
+
+byte reader(unsigned long address) {
+    return EEPROM.read(address);
+}
+
 void setup() {
-  // Initialize pins
-  pinMode(ledPin, OUTPUT);
+    if (EEPROM.read(0)) logInterval = (long) EEPROM.read(0);
+    if (EEPROM.read(1)) logData = (boolean) EEPROM.read(1);
+    
+    // Initialize pins
+    pinMode(ledPin, OUTPUT);
   
-  if (logInterval == 0) logData = false;
-  
-  DHT11.attach(dht11Pin);
-  Serial.begin(9600);
-  
-  db.create(TABLE, sizeof(myrec));
-  db.open(TABLE);
+    if (logInterval == 0) logData = false;
+    
+    DHT11.attach(dht11Pin);
+    Serial.begin(9600);
+    
+    if (db.count()) db.open(db.count());
+    else db.create(3, TABLE_SIZE, sizeof(myrec));
 }
 
 void loop() {
@@ -82,11 +97,12 @@ void loop() {
             msgComplete = false;
         }
     }
-    //if (Serial.available() == 0) msg = "";
+    
+    if (addr == 2) addr = 0;
   
     unsigned long currentMillis = millis();
   
-    if(currentMillis - previousMillis >= logInterval && logData && logs < 256) {
+    if(currentMillis - previousMillis >= logInterval * 1000 && logData) {
         previousMillis = currentMillis;
       
         readDHT11();
@@ -94,9 +110,9 @@ void loop() {
 }
 
 void readData() {
-  if (db.nRecs()) Serial.println("-----");
-  for (int i = 1; i <= db.nRecs(); i++) {
-    db.read(i, DB_REC myrec);
+  if (db.count()) Serial.println("-----");
+  for (int i = 1; i <= db.count(); i++) {
+    db.readRec(i, EDB_REC myrec);
     Serial.print("Recnum: "); Serial.println(i); 
     Serial.print("Humidity: "); Serial.println(myrec.humidity);
     Serial.print("Temperature: "); Serial.println(myrec.temperature);
@@ -105,23 +121,22 @@ void readData() {
 }
 
 void clearData() {
-    for (int i = 0; i <= db.nRecs(); i++) {
-        db.deleteRec(i);
-    }
+    db.clear();
 }
 
 void setTravelTime() {
     Serial.println("set travel time in sec");
     while (Serial.available() == 0) { }
     
-    int input = Serial.parseInt();
-    travelTime = input;
+    travelTime = Serial.parseInt();
     setLogInterval();
 }
 
 void setLogInterval() {
-    logInterval = (travelTime * 1000) / maxLogs;
+    logInterval = travelTime / maxLogs;
     logData = true;
+    EEPROM.write(0,logInterval);
+    EEPROM.write(1,logData);
 }
 
 void readDHT11() {
@@ -141,16 +156,15 @@ void readDHT11() {
 //      Serial.println((double) DHT11.temperature, DEC);
       myrec.temperature = (int) DHT11.temperature;
     
-      db.append(DB_REC myrec);
-      logs++;
+      if (db.count() <= 253) db.appendRec(EDB_REC myrec);
 }
 
 void calcAvgHumidity() {
     int totalHumidity = 0;
     int cases = 0;
-    if (db.nRecs()) {
-        for (int i = 1; i <= db.nRecs(); i++) {
-            db.read(i, DB_REC myrec);
+    if (db.count()) {
+        for (int i = 1; i <= db.count(); i++) {
+            db.readRec(i, EDB_REC myrec);
             totalHumidity += myrec.humidity;
             cases++;
         }
@@ -161,9 +175,9 @@ void calcAvgHumidity() {
 void calcAvgTemp() {
     int totalTemp = 0;
     int cases = 0;
-    if (db.nRecs()) {
-        for (int i = 1; i <= db.nRecs(); i++) {
-            db.read(i, DB_REC myrec);
+    if (db.count()) {
+        for (int i = 1; i <= db.count(); i++) {
+            db.readRec(i, EDB_REC myrec);
             totalTemp += myrec.temperature;
             cases++;
         }
@@ -172,11 +186,11 @@ void calcAvgTemp() {
 }
 
 void Humi() {
-    if (db.nRecs()) {
-        Serial.println(db.nRecs());
+    if (db.count()) {
+        Serial.println(db.count());
         Serial.println("Start");
-        for (int i = 1; i <= db.nRecs(); i++) {
-            db.read(i, DB_REC myrec);
+        for (int i = 1; i <= db.count(); i++) {
+            db.readRec(i, EDB_REC myrec);
             Serial.println(myrec.humidity);
         }
         Serial.println("End");
@@ -184,10 +198,10 @@ void Humi() {
 }
 
 void Temp() {
-    if (db.nRecs()) {
+    if (db.count()) {
         Serial.println("Start");
-        for (int i = 1; i <= db.nRecs(); i++) {
-            db.read(i, DB_REC myrec);
+        for (int i = 1; i <= db.count(); i++) {
+            db.readRec(i, EDB_REC myrec);
             Serial.println(myrec.temperature);
         }
         Serial.println("End");

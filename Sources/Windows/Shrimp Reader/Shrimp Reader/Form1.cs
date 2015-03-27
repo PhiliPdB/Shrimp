@@ -15,6 +15,7 @@ namespace Shrimp_Reader {
 
         private SerialPort myport;                  // Serial port
         private string in_data;                     // Data in save string
+        private string data;                        // in_data string without the \r
         private static string port;                 // Serial port name
         List<int> temperature = new List<int>();    // Temperatures over time
         List<int> humidity = new List<int>();       // Humidities over time
@@ -63,8 +64,10 @@ namespace Shrimp_Reader {
             }
 
             try {
+                Temp_Graph.Series["Series1"].Points.Clear();
+                temperature.Clear();
                 myport.WriteLine("viewTemp");
-                myport.WriteLine("viewHumi");
+                //myport.WriteLine("viewHumi");
                 data_tb.Text = "";
             } catch(Exception ex) {
                 MessageBox.Show(ex.Message,"Error");
@@ -81,19 +84,20 @@ namespace Shrimp_Reader {
         }
         
         void getTemp(object sender, EventArgs e) {
-            string data = in_data.Replace("\r","");
+            if (data.Equals("End")) {
+                tempStarted = false;
+                init_Temp_Graph();
+            }
             
             if (tempStarted && !humiStarted) temperature.Add(int.Parse(data));
 
             if (data.Equals("Start")) tempStarted = true;
-            if (data.Equals("End")) tempStarted = false;
-
-            init_Temp_Graph();
         }
 
         void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
             
             in_data = myport.ReadLine();
+            data = in_data.Replace("\r", "");
             
             // Displays what the Shrimp sends
             this.Invoke(new EventHandler(displaydata_event));
