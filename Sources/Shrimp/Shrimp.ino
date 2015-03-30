@@ -92,13 +92,12 @@ void loop() {
                 Serial.println(avgTemp);
             } else if (msg == "clearData") clearData();
             else if (msg == "viewTemp") Temp();
+            else if (msg == "viewHumi") Humi();
             
             msg = "";
             msgComplete = false;
         }
     }
-    
-    if (addr == 2) addr = 0;
   
     unsigned long currentMillis = millis();
   
@@ -187,7 +186,6 @@ void calcAvgTemp() {
 
 void Humi() {
     if (db.count()) {
-        Serial.println(db.count());
         Serial.println("Start");
         for (int i = 1; i <= db.count(); i++) {
             db.readRec(i, EDB_REC myrec);

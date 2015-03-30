@@ -37,38 +37,42 @@
             this.stop_btn = new System.Windows.Forms.Button();
             this.save_btn = new System.Windows.Forms.Button();
             this.data_tb = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.output = new System.Windows.Forms.Label();
             this.Temp_Graph = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Humidity_Graph = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.humidity_title = new System.Windows.Forms.Label();
+            this.temperature_title = new System.Windows.Forms.Label();
+            this.avg_humi_text = new System.Windows.Forms.Label();
+            this.avg_humi = new System.Windows.Forms.Label();
+            this.avg_temp_text = new System.Windows.Forms.Label();
+            this.avg_temp = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Temp_Graph)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Humidity_Graph)).BeginInit();
             this.SuspendLayout();
             // 
             // start_btn
             // 
-            this.start_btn.Location = new System.Drawing.Point(61, 281);
+            this.start_btn.Location = new System.Drawing.Point(61, 321);
             this.start_btn.Name = "start_btn";
             this.start_btn.Size = new System.Drawing.Size(136, 45);
             this.start_btn.TabIndex = 0;
-            this.start_btn.Text = "Start";
+            this.start_btn.Text = "View data";
             this.start_btn.UseVisualStyleBackColor = true;
             this.start_btn.Click += new System.EventHandler(this.start_btn_Click);
             // 
             // stop_btn
             // 
-            this.stop_btn.Location = new System.Drawing.Point(61, 332);
+            this.stop_btn.Location = new System.Drawing.Point(61, 372);
             this.stop_btn.Name = "stop_btn";
             this.stop_btn.Size = new System.Drawing.Size(136, 45);
             this.stop_btn.TabIndex = 1;
-            this.stop_btn.Text = "Stop";
+            this.stop_btn.Text = "Clear data";
             this.stop_btn.UseVisualStyleBackColor = true;
             this.stop_btn.Click += new System.EventHandler(this.stop_btn_click);
             // 
             // save_btn
             // 
-            this.save_btn.Location = new System.Drawing.Point(61, 383);
+            this.save_btn.Location = new System.Drawing.Point(61, 423);
             this.save_btn.Name = "save_btn";
             this.save_btn.Size = new System.Drawing.Size(136, 45);
             this.save_btn.TabIndex = 2;
@@ -78,25 +82,27 @@
             // 
             // data_tb
             // 
-            this.data_tb.Location = new System.Drawing.Point(530, 281);
+            this.data_tb.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.data_tb.Location = new System.Drawing.Point(530, 321);
             this.data_tb.Multiline = true;
             this.data_tb.Name = "data_tb";
             this.data_tb.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.data_tb.Size = new System.Drawing.Size(275, 212);
             this.data_tb.TabIndex = 3;
             // 
-            // label2
+            // output
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(527, 265);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(39, 13);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Output";
+            this.output.AutoSize = true;
+            this.output.Location = new System.Drawing.Point(527, 305);
+            this.output.Name = "output";
+            this.output.Size = new System.Drawing.Size(39, 13);
+            this.output.TabIndex = 6;
+            this.output.Text = "Output";
             // 
             // Temp_Graph
             // 
             this.Temp_Graph.BackColor = System.Drawing.Color.Transparent;
+            chartArea1.AxisX.Minimum = 0D;
             chartArea1.BackColor = System.Drawing.Color.Transparent;
             chartArea1.Name = "ChartArea1";
             this.Temp_Graph.ChartAreas.Add(chartArea1);
@@ -115,6 +121,7 @@
             // Humidity_Graph
             // 
             this.Humidity_Graph.BackColor = System.Drawing.Color.Transparent;
+            chartArea2.AxisX.Minimum = 0D;
             chartArea2.BackColor = System.Drawing.Color.Transparent;
             chartArea2.BorderColor = System.Drawing.Color.Transparent;
             chartArea2.BorderDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
@@ -132,34 +139,78 @@
             this.Humidity_Graph.TabIndex = 8;
             this.Humidity_Graph.Text = "chart1";
             // 
-            // label1
+            // humidity_title
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 29);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(50, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Humidity:";
+            this.humidity_title.AutoSize = true;
+            this.humidity_title.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.humidity_title.Location = new System.Drawing.Point(12, 29);
+            this.humidity_title.Name = "humidity_title";
+            this.humidity_title.Size = new System.Drawing.Size(66, 17);
+            this.humidity_title.TabIndex = 9;
+            this.humidity_title.Text = "Humidity:";
             // 
-            // label3
+            // temperature_title
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(417, 29);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(70, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Temperature:";
+            this.temperature_title.AutoSize = true;
+            this.temperature_title.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.temperature_title.Location = new System.Drawing.Point(417, 29);
+            this.temperature_title.Name = "temperature_title";
+            this.temperature_title.Size = new System.Drawing.Size(94, 17);
+            this.temperature_title.TabIndex = 10;
+            this.temperature_title.Text = "Temperature:";
+            // 
+            // avg_humi_text
+            // 
+            this.avg_humi_text.AutoSize = true;
+            this.avg_humi_text.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.avg_humi_text.Location = new System.Drawing.Point(12, 265);
+            this.avg_humi_text.Name = "avg_humi_text";
+            this.avg_humi_text.Size = new System.Drawing.Size(65, 17);
+            this.avg_humi_text.TabIndex = 11;
+            this.avg_humi_text.Text = "Average:";
+            // 
+            // avg_humi
+            // 
+            this.avg_humi.AutoSize = true;
+            this.avg_humi.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.avg_humi.Location = new System.Drawing.Point(83, 265);
+            this.avg_humi.Name = "avg_humi";
+            this.avg_humi.Size = new System.Drawing.Size(0, 17);
+            this.avg_humi.TabIndex = 12;
+            // 
+            // avg_temp_text
+            // 
+            this.avg_temp_text.AutoSize = true;
+            this.avg_temp_text.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.avg_temp_text.Location = new System.Drawing.Point(417, 265);
+            this.avg_temp_text.Name = "avg_temp_text";
+            this.avg_temp_text.Size = new System.Drawing.Size(65, 17);
+            this.avg_temp_text.TabIndex = 13;
+            this.avg_temp_text.Text = "Average:";
+            // 
+            // avg_temp
+            // 
+            this.avg_temp.AutoSize = true;
+            this.avg_temp.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.avg_temp.Location = new System.Drawing.Point(488, 265);
+            this.avg_temp.Name = "avg_temp";
+            this.avg_temp.Size = new System.Drawing.Size(0, 17);
+            this.avg_temp.TabIndex = 14;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(817, 505);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(817, 545);
+            this.Controls.Add(this.avg_temp);
+            this.Controls.Add(this.avg_temp_text);
+            this.Controls.Add(this.avg_humi);
+            this.Controls.Add(this.avg_humi_text);
+            this.Controls.Add(this.temperature_title);
+            this.Controls.Add(this.humidity_title);
             this.Controls.Add(this.Humidity_Graph);
             this.Controls.Add(this.Temp_Graph);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.output);
             this.Controls.Add(this.data_tb);
             this.Controls.Add(this.save_btn);
             this.Controls.Add(this.stop_btn);
@@ -181,11 +232,15 @@
         private System.Windows.Forms.Button stop_btn;
         private System.Windows.Forms.Button save_btn;
         private System.Windows.Forms.TextBox data_tb;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label output;
         private System.Windows.Forms.DataVisualization.Charting.Chart Temp_Graph;
         private System.Windows.Forms.DataVisualization.Charting.Chart Humidity_Graph;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label humidity_title;
+        private System.Windows.Forms.Label temperature_title;
+        private System.Windows.Forms.Label avg_humi_text;
+        private System.Windows.Forms.Label avg_humi;
+        private System.Windows.Forms.Label avg_temp_text;
+        private System.Windows.Forms.Label avg_temp;
     }
 }
 

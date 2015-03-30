@@ -22,6 +22,8 @@ namespace Shrimp_Reader {
 
         private bool tempStarted = false;           // If temp logging is started the boolean is true
         private bool humiStarted = false;           // Same as above, but for humidity
+        private bool tempLogging = false;
+        private bool humiLogging = false;
 
         public Form1() {
             InitializeComponent();
@@ -64,10 +66,7 @@ namespace Shrimp_Reader {
             }
 
             try {
-                Temp_Graph.Series["Series1"].Points.Clear();
-                temperature.Clear();
-                myport.WriteLine("viewTemp");
-                //myport.WriteLine("viewHumi");
+                getData();
                 data_tb.Text = "";
             } catch(Exception ex) {
                 MessageBox.Show(ex.Message,"Error");
@@ -75,10 +74,19 @@ namespace Shrimp_Reader {
             }
         }
 
-        public void init_Temp_Graph()
-        {
-            for (int i = 0; i < temperature.Count; i++)
-            {
+        public void getData() {
+            Temp_Graph.Series["Series1"].Points.Clear();
+            Humidity_Graph.Series["Series1"].Points.Clear();
+            temperature.Clear();
+            humidity.Clear();
+
+            humiLogging = true;
+            myport.WriteLine("viewHumi");
+            myport.WriteLine("viewTemp");
+        }
+
+        public void init_Temp_Graph() {
+            for (int i = 0; i < temperature.Count; i++) {
                 Temp_Graph.Series["Series1"].Points.AddXY(i, temperature[i]);
             }
         }
@@ -86,12 +94,32 @@ namespace Shrimp_Reader {
         void getTemp(object sender, EventArgs e) {
             if (data.Equals("End")) {
                 tempStarted = false;
+                tempLogging = false;
                 init_Temp_Graph();
             }
             
             if (tempStarted && !humiStarted) temperature.Add(int.Parse(data));
 
             if (data.Equals("Start")) tempStarted = true;
+        }
+
+        public void init_Humi_Graph() {
+            for (int i = 0; i < humidity.Count; i++) {
+                Humidity_Graph.Series["Series1"].Points.AddXY(i, humidity[i]);
+            }
+        }
+
+        void getHumi(object sender, EventArgs e) {
+            if (data.Equals("End")) {
+                humiStarted = false;
+                humiLogging = false;
+                tempLogging = true;
+                init_Humi_Graph();
+            }
+
+            if (!tempStarted && humiStarted) humidity.Add(int.Parse(data));
+
+            if (data.Equals("Start")) humiStarted = true;
         }
 
         void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
@@ -101,8 +129,9 @@ namespace Shrimp_Reader {
             
             // Displays what the Shrimp sends
             this.Invoke(new EventHandler(displaydata_event));
-            // Initialize the Temperature graph
-            this.Invoke(new EventHandler(getTemp));
+            // Initialize the graphs
+            if (tempLogging && !humiLogging) this.Invoke(new EventHandler(getTemp));
+            if (humiLogging && !tempLogging) this.Invoke(new EventHandler(getHumi));
         }
 
         private void displaydata_event(object sender, EventArgs e) {
@@ -111,7 +140,7 @@ namespace Shrimp_Reader {
 
         private void stop_btn_click(object sender, EventArgs e) {
             try {
-                myport.Close();
+                myport.WriteLine("clearData");
             } catch (Exception ex2) {
                 MessageBox.Show(ex2.Message, "Error");
             }
