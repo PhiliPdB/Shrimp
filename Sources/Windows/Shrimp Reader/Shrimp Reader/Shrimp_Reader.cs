@@ -11,21 +11,22 @@ using System.IO.Ports;
 using System.IO;
 
 namespace Shrimp_Reader {
-    public partial class Form1 : Form {
+    public partial class Shrimp_Reader : Form {
 
-        private SerialPort myport;                  // Serial port
-        private string in_data;                     // Data in save string
-        private string data;                        // in_data string without the \r
-        private static string port;                 // Serial port name
-        List<int> temperature = new List<int>();    // Temperatures over time
-        List<int> humidity = new List<int>();       // Humidities over time
+        private Form setup_trip = new Setup_Trip();
+        public static SerialPort myport;                    // Serial port
+        private string in_data;                             // Data in save string
+        private string data;                                // in_data string without the \r
+        private static string port;                         // Serial port name
+        private List<int> temperature = new List<int>();    // Temperatures over time
+        private List<int> humidity = new List<int>();       // Humidities over time
 
-        private bool tempStarted = false;           // If temp logging is started the boolean is true
-        private bool humiStarted = false;           // Same as above, but for humidity
+        private bool tempStarted = false;                   // If temp logging is started the boolean is true
+        private bool humiStarted = false;                   // Same as above, but for humidity
         private bool tempLogging = false;
         private bool humiLogging = false;
 
-        public Form1() {
+        public Shrimp_Reader() {
             InitializeComponent();
             this.Load += Form1_Load;
         }
@@ -67,7 +68,6 @@ namespace Shrimp_Reader {
 
             try {
                 getData();
-                data_tb.Text = "";
             } catch(Exception ex) {
                 MessageBox.Show(ex.Message,"Error");
                 port = PromptPort.ShowDialog("Please select a port", "Port");
@@ -208,6 +208,11 @@ namespace Shrimp_Reader {
 
                 return comboBox.Text.ToString(); // Return the name of the selected port
             }
+        }
+
+        private void init_trip_btn_Click(object sender, EventArgs e) {
+            myport.WriteLine("setTravelTime");
+            setup_trip.ShowDialog();
         }
     }
 }

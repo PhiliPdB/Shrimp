@@ -16,7 +16,7 @@ namespace Shrimp_Reader
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Shrimp_Reader());
         }
     }
 }

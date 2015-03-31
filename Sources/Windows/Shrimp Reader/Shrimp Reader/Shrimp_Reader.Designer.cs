@@ -1,6 +1,6 @@
 ﻿namespace Shrimp_Reader
 {
-    partial class Form1
+    partial class Shrimp_Reader
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Shrimp_Reader));
             this.start_btn = new System.Windows.Forms.Button();
             this.stop_btn = new System.Windows.Forms.Button();
             this.save_btn = new System.Windows.Forms.Button();
@@ -46,6 +46,7 @@
             this.avg_humi = new System.Windows.Forms.Label();
             this.avg_temp_text = new System.Windows.Forms.Label();
             this.avg_temp = new System.Windows.Forms.Label();
+            this.init_trip_btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Temp_Graph)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Humidity_Graph)).BeginInit();
             this.SuspendLayout();
@@ -197,11 +198,22 @@
             this.avg_temp.Size = new System.Drawing.Size(0, 17);
             this.avg_temp.TabIndex = 14;
             // 
+            // init_trip_btn
+            // 
+            this.init_trip_btn.Location = new System.Drawing.Point(275, 321);
+            this.init_trip_btn.Name = "init_trip_btn";
+            this.init_trip_btn.Size = new System.Drawing.Size(136, 45);
+            this.init_trip_btn.TabIndex = 15;
+            this.init_trip_btn.Text = "Setup trip data";
+            this.init_trip_btn.UseVisualStyleBackColor = true;
+            this.init_trip_btn.Click += new System.EventHandler(this.init_trip_btn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(817, 545);
+            this.Controls.Add(this.init_trip_btn);
             this.Controls.Add(this.avg_temp);
             this.Controls.Add(this.avg_temp_text);
             this.Controls.Add(this.avg_humi);
@@ -241,6 +253,7 @@
         private System.Windows.Forms.Label avg_humi;
         private System.Windows.Forms.Label avg_temp_text;
         private System.Windows.Forms.Label avg_temp;
+        private System.Windows.Forms.Button init_trip_btn;
     }
 }
 
