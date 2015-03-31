@@ -24,13 +24,15 @@ const int dht11Pin = 8;
 
 // Variables to use for the interval
 unsigned long previousMillis = 0;
-unsigned long logDelay;                           // Log delay in milliseconds
-long logInterval = 0;                            // Log interval in milliseconds
+unsigned long previousLogMillis = 0;
+unsigned long logDelay = 0;                       // Log delay in milliseconds
+int logInterval = 0;                             // Log interval in milliseconds
 
 // Variables
 dht11 DHT11;
 EDB db(&writer, &reader);
 long travelTime; // Total travel time in s
+boolean travelTimeSet = false;
 int maxLogs = 252;
 String msg;
 boolean logData = false;
@@ -54,9 +56,56 @@ byte reader(unsigned long address) {
     return EEPROM.read(address);
 }
 
+void EEPROMWritelong(int address, long value) {
+      //Decomposition from a long to 4 bytes by using bitshift.
+      //One = Most significant -> Four = Least significant byte
+      byte four = (value & 0xFF);
+      byte three = ((value >> 8) & 0xFF);
+      byte two = ((value >> 16) & 0xFF);
+      byte one = ((value >> 24) & 0xFF);
+
+      //Write the 4 bytes into the eeprom memory.
+      EEPROM.write(address, four);
+      EEPROM.write(address + 1, three);
+      EEPROM.write(address + 2, two);
+      EEPROM.write(address + 3, one);
+}
+
+long EEPROMReadlong(long address) {
+      //Read the 4 bytes from the eeprom memory.
+      long four = EEPROM.read(address);
+      long three = EEPROM.read(address + 1);
+      long two = EEPROM.read(address + 2);
+      long one = EEPROM.read(address + 3);
+
+      //Return the recomposed long by using bitshift.
+      return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
+}
+
+//This function will write a 2 byte integer to the eeprom at the specified address and address + 1
+void EEPROMWriteInt(int address, int value) {
+     byte lowByte = ((value >> 0) & 0xFF);
+     byte highByte = ((value >> 8) & 0xFF);
+
+     EEPROM.write(address, lowByte);
+     EEPROM.write(address + 1, highByte);
+}
+
+//This function will read a 2 byte integer from the eeprom at the specified address and address + 1
+unsigned int EEPROMReadInt(int address) {
+     byte lowByte = EEPROM.read(address);
+     byte highByte = EEPROM.read(address + 1);
+
+     return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
+}
+
 void setup() {
-    if (EEPROM.read(0)) logInterval = (long) EEPROM.read(0);
-    if (EEPROM.read(1)) logData = (boolean) EEPROM.read(1);
+    if (EEPROMReadInt(0)) logInterval = (int) EEPROMReadInt(0);
+    if (EEPROM.read(2)) logData = (boolean) EEPROM.read(2);
+    if (EEPROMReadlong(3)) previousLogMillis = (long) EEPROMReadlong(3);
+    if (EEPROM.read(7)) travelTimeSet = (boolean) EEPROM.read(7);
+    if (EEPROMReadInt(8)) logDelay = (int) EEPROMReadInt(8);
+    if (EEPROMReadlong(10)) travelTime = (long) EEPROMReadlong(10);
     
     // Initialize pins
     pinMode(ledPin, OUTPUT);
@@ -67,7 +116,7 @@ void setup() {
     Serial.begin(9600);
     
     if (db.count()) db.open(db.count());
-    else db.create(3, TABLE_SIZE, sizeof(myrec));
+    else db.create(14, TABLE_SIZE, sizeof(myrec));
 }
 
 void loop() {
@@ -101,10 +150,14 @@ void loop() {
   
     unsigned long currentMillis = millis();
   
-    if(currentMillis - previousMillis >= logInterval * 1000 && logData) {
+    if (currentMillis - previousMillis >= logInterval * 1000 && logData) {
         previousMillis = currentMillis;
       
         readDHT11();
+    }
+    
+    if (travelTimeSet && currentMillis - previousLogMillis >= logDelay) {
+        setLogInterval();
     }
 }
 
@@ -121,21 +174,30 @@ void readData() {
 
 void clearData() {
     db.clear();
+    for ( int i = 0 ; i < EEPROM.length() ; i++ ) EEPROM.write(i, 0);
 }
 
 void setTravelTime() {
     Serial.println("set travel time in sec");
     while (Serial.available() == 0) { }
-    
     travelTime = Serial.parseInt();
-    setLogInterval();
+    
+    while (Serial.available() ==0) { }
+    logDelay = Serial.parseInt();
+    previousLogMillis = millis();
+    travelTimeSet = true;
+    
+    EEPROMWritelong(3, previousLogMillis);
+    EEPROM.write(7,travelTimeSet);
+    EEPROMWriteInt(8,logDelay);
+    EEPROMWritelong(10, travelTime);
 }
 
 void setLogInterval() {
     logInterval = travelTime / maxLogs;
     logData = true;
-    EEPROM.write(0,logInterval);
-    EEPROM.write(1,logData);
+    EEPROMWriteInt(0,logInterval);
+    EEPROM.write(2,logData);
 }
 
 void readDHT11() {
