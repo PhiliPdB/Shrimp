@@ -28,14 +28,14 @@ int logInterval = 0;                             // Log interval in milliseconds
 dht11 DHT11;
 long travelTime; // Total travel time in s
 boolean travelTimeSet = false;
-int maxLogs = 500;
+int maxLogs = 504;
 String msg;
 boolean logData = false;
 
 int avgHumidity;
 int avgTemp;
 
-int addr = 17;
+int addr = 16;
 
 void EEPROMWritelong(int address, long value) {
       //Decomposition from a long to 4 bytes by using bitshift.
@@ -127,7 +127,7 @@ void loop() {
   
     unsigned long currentMillis = millis();
   
-    if (currentMillis - previousMillis >= logInterval * 1000 && logData && addr % 2 != 0 && addr < 1025) {
+    if (currentMillis - previousMillis >= logInterval * 1000 && logData && addr % 2 == 0 && addr < 1024) {
         previousMillis = currentMillis;
       
         readDHT11();
@@ -141,13 +141,13 @@ void loop() {
 void readData() {
     int y = 1;
     Serial.println("-----");
-    for (int i = 17; i < addr; i++) {
+    for (int i = 16; i < addr; i++) {
         int x = (int) EEPROM.read(i);
-        if (i % 2 != 0) {
+        if (i % 2 == 0) {
             Serial.print("Recnum: "); Serial.println(y);
             Serial.print("Humidity: "); Serial.println(x);
             y++;
-        } else if (i % 2 == 0) {
+        } else if (i % 2 != 0) {
             Serial.print("Temperature: "); Serial.println(x);
             Serial.println("-----");
         } 
@@ -155,7 +155,8 @@ void readData() {
 }
 
 void clearData() {
-    for ( int i = 0 ; i < EEPROM.length() ; i++ ) EEPROM.write(i, 0);
+    for ( int i = 0 ; i < 1024 ; i++ ) EEPROM.write(i, 0);
+    Serial.println("Data succesfully cleared");
 }
 
 void setTravelTime() {
@@ -163,7 +164,7 @@ void setTravelTime() {
     while (Serial.available() == 0) { }
     travelTime = Serial.parseInt();
     
-    while (Serial.available() ==0) { }
+    while (Serial.available() == 0) { }
     logDelay = Serial.parseInt();
     previousLogMillis = millis();
     travelTimeSet = true;
@@ -205,8 +206,8 @@ void readDHT11() {
 void calcAvgHumidity() {
     int totalHumidity = 0;
     int cases = 0;
-    for (int i = 17; i < addr; i++) {
-        if (i % 2 != 0) {
+    for (int i = 16; i < addr; i++) {
+        if (i % 2 == 0) {
             totalHumidity += (int) EEPROM.read(i);
             cases++;
         }
@@ -217,8 +218,8 @@ void calcAvgHumidity() {
 void calcAvgTemp() {
     int totalTemp = 0;
     int cases = 0;
-    for (int i = 17; i < addr; i++) {
-        if (i % 2 == 0) {
+    for (int i = 16; i < addr; i++) {
+        if (i % 2 != 0) {
             totalTemp += (int) EEPROM.read(i);
             cases++;
         }
@@ -228,14 +229,14 @@ void calcAvgTemp() {
 
 void Humi() {
     Serial.println("Start");
-    for (int i = 17; i < addr; i++)
-        if (i % 2 != 0) Serial.println(EEPROM.read(i), DEC);
+    for (int i = 16; i < addr; i++)
+        if (i % 2 == 0) Serial.println(EEPROM.read(i), DEC);
     Serial.println("End");
 }
 
 void Temp() {
     Serial.println("Start");
-    for (int i = 17; i < addr; i++)
-        if (i % 2 == 0) Serial.println(EEPROM.read(i), DEC);
+    for (int i = 16; i < addr; i++)
+        if (i % 2 != 0) Serial.println(EEPROM.read(i), DEC);
     Serial.println("End");
 }
