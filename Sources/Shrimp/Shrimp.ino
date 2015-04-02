@@ -28,14 +28,14 @@ int logInterval = 0;                             // Log interval in milliseconds
 dht11 DHT11;
 long travelTime; // Total travel time in s
 boolean travelTimeSet = false;
-int maxLogs = 504;
+int maxLogs = 503;
 String msg;
 boolean logData = false;
 
 int avgHumidity;
 int avgTemp;
 
-int addr = 16;
+int addr = 18;
 
 void EEPROMWritelong(int address, long value) {
       //Decomposition from a long to 4 bytes by using bitshift.
@@ -85,9 +85,9 @@ void setup() {
     if (EEPROM.read(2)) logData = (boolean) EEPROM.read(2);
     if (EEPROMReadlong(3)) previousLogMillis = (long) EEPROMReadlong(3);
     if (EEPROM.read(7)) travelTimeSet = (boolean) EEPROM.read(7);
-    if (EEPROMReadInt(8)) logDelay = (int) EEPROMReadInt(8);
-    if (EEPROMReadlong(10)) travelTime = (long) EEPROMReadlong(10);
-    if (EEPROMReadInt(14)) addr = (int) EEPROMReadInt(14);
+    if (EEPROMReadlong(8)) logDelay = (int) EEPROMReadInt(8);
+    if (EEPROMReadlong(12)) travelTime = (long) EEPROMReadlong(10);
+    if (EEPROMReadInt(16)) addr = (int) EEPROMReadInt(14);
     
     if (logInterval <= 1000) logData = false;
     
@@ -133,7 +133,7 @@ void loop() {
         readDHT11();
     }
     
-    if (travelTimeSet && currentMillis - previousLogMillis >= logDelay) {
+    if (travelTimeSet && currentMillis - previousLogMillis >= logDelay * 1000) {
         setLogInterval();
     }
 }
@@ -141,7 +141,7 @@ void loop() {
 void readData() {
     int y = 1;
     Serial.println("-----");
-    for (int i = 16; i < addr; i++) {
+    for (int i = 18; i < addr; i++) {
         int x = (int) EEPROM.read(i);
         if (i % 2 == 0) {
             Serial.print("Recnum: "); Serial.println(y);
@@ -165,14 +165,16 @@ void setTravelTime() {
     travelTime = Serial.parseInt();
     
     while (Serial.available() == 0) { }
-    logDelay = Serial.parseInt();
+    logDelay = (long) Serial.parseInt();
     previousLogMillis = millis();
     travelTimeSet = true;
+    Serial.print("Shrimp starts logging over ");
+    Serial.print(logDelay);Serial.println(" Seconds");
     
     EEPROMWritelong(3, previousLogMillis);
     EEPROM.write(7,travelTimeSet);
-    EEPROMWriteInt(8,logDelay);
-    EEPROMWritelong(10, travelTime);
+    EEPROMWritelong(8,logDelay);
+    EEPROMWritelong(12, travelTime);
 }
 
 void setLogInterval() {
@@ -206,7 +208,7 @@ void readDHT11() {
 void calcAvgHumidity() {
     int totalHumidity = 0;
     int cases = 0;
-    for (int i = 16; i < addr; i++) {
+    for (int i = 18; i < addr; i++) {
         if (i % 2 == 0) {
             totalHumidity += (int) EEPROM.read(i);
             cases++;
@@ -218,7 +220,7 @@ void calcAvgHumidity() {
 void calcAvgTemp() {
     int totalTemp = 0;
     int cases = 0;
-    for (int i = 16; i < addr; i++) {
+    for (int i = 18; i < addr; i++) {
         if (i % 2 != 0) {
             totalTemp += (int) EEPROM.read(i);
             cases++;
@@ -229,14 +231,14 @@ void calcAvgTemp() {
 
 void Humi() {
     Serial.println("Start");
-    for (int i = 16; i < addr; i++)
+    for (int i = 18; i < addr; i++)
         if (i % 2 == 0) Serial.println(EEPROM.read(i), DEC);
     Serial.println("End");
 }
 
 void Temp() {
     Serial.println("Start");
-    for (int i = 16; i < addr; i++)
+    for (int i = 18; i < addr; i++)
         if (i % 2 != 0) Serial.println(EEPROM.read(i), DEC);
     Serial.println("End");
 }
