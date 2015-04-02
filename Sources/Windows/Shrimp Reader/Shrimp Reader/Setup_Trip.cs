@@ -23,9 +23,20 @@ namespace Shrimp_Reader {
             DateTime now = DateTime.Now;
             TimeSpan delay = TravelDelay.Value.Subtract(now);
             
-            Shrimp_Reader.myport.WriteLine(Convert.ToInt32(delay.TotalSeconds) + "");
+            Shrimp_Reader.myport.WriteLine(Convert.ToInt32(delay.TotalMilliseconds) + "");
+
+            MessageBox.Show("Be sure that the Shrimp is connected to a power source when start logging.",
+                "Important Note",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
 
             this.Close();
+        }
+
+        private void cancel_btn_Click(object sender, EventArgs e) {
+            Shrimp_Reader.myport.WriteLine("0");
+            Shrimp_Reader.myport.WriteLine("0");
         }
     }
 }

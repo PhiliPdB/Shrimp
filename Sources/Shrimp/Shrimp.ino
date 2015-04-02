@@ -133,7 +133,7 @@ void loop() {
         readDHT11();
     }
     
-    if (travelTimeSet && currentMillis - previousLogMillis >= logDelay * 1000) {
+    if (travelTimeSet && currentMillis - previousLogMillis >= logDelay) {
         setLogInterval();
     }
 }
@@ -156,6 +156,7 @@ void readData() {
 
 void clearData() {
     for ( int i = 0 ; i < 1024 ; i++ ) EEPROM.write(i, 0);
+    addr = 18;
     Serial.println("Data succesfully cleared");
 }
 
@@ -169,7 +170,7 @@ void setTravelTime() {
     previousLogMillis = millis();
     travelTimeSet = true;
     Serial.print("Shrimp starts logging over ");
-    Serial.print(logDelay);Serial.println(" Seconds");
+    Serial.print(logDelay);Serial.println(" milliseconds");
     
     EEPROMWritelong(3, previousLogMillis);
     EEPROM.write(7,travelTimeSet);
