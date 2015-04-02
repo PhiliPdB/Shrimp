@@ -31,10 +31,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Setup_Trip));
             this.cancel_btn = new System.Windows.Forms.Button();
             this.setup_btn = new System.Windows.Forms.Button();
-            this.TravelTime = new System.Windows.Forms.DateTimePicker();
             this.Question1 = new System.Windows.Forms.Label();
             this.Question2 = new System.Windows.Forms.Label();
             this.TravelDelay = new System.Windows.Forms.DateTimePicker();
+            this.Time_Txt = new System.Windows.Forms.Label();
+            this.Time_Hours = new System.Windows.Forms.NumericUpDown();
+            this.Time_Minutes = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.Time_Hours)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Time_Minutes)).BeginInit();
             this.SuspendLayout();
             // 
             // cancel_btn
@@ -55,19 +59,7 @@
             this.setup_btn.TabIndex = 1;
             this.setup_btn.Text = "Setup";
             this.setup_btn.UseVisualStyleBackColor = true;
-            // 
-            // TravelTime
-            // 
-            this.TravelTime.CustomFormat = "HH:mm";
-            this.TravelTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.TravelTime.Location = new System.Drawing.Point(172, 29);
-            this.TravelTime.MinDate = new System.DateTime(2015, 3, 31, 0, 0, 0, 0);
-            this.TravelTime.Name = "TravelTime";
-            this.TravelTime.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.TravelTime.ShowUpDown = true;
-            this.TravelTime.Size = new System.Drawing.Size(100, 20);
-            this.TravelTime.TabIndex = 4;
-            this.TravelTime.Value = new System.DateTime(2015, 3, 31, 0, 0, 0, 0);
+            this.setup_btn.Click += new System.EventHandler(this.setup_btn_Click);
             // 
             // Question1
             // 
@@ -75,9 +67,9 @@
             this.Question1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Question1.Location = new System.Drawing.Point(9, 9);
             this.Question1.Name = "Question1";
-            this.Question1.Size = new System.Drawing.Size(187, 17);
+            this.Question1.Size = new System.Drawing.Size(243, 17);
             this.Question1.TabIndex = 5;
-            this.Question1.Text = "How long takes the journey?";
+            this.Question1.Text = "How long takes the journey? (hh:mm)";
             // 
             // Question2
             // 
@@ -99,6 +91,30 @@
             this.TravelDelay.TabIndex = 7;
             this.TravelDelay.Value = new System.DateTime(2015, 3, 31, 18, 37, 2, 0);
             // 
+            // Time_Txt
+            // 
+            this.Time_Txt.AutoSize = true;
+            this.Time_Txt.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Time_Txt.Location = new System.Drawing.Point(211, 29);
+            this.Time_Txt.Name = "Time_Txt";
+            this.Time_Txt.Size = new System.Drawing.Size(12, 17);
+            this.Time_Txt.TabIndex = 8;
+            this.Time_Txt.Text = ":";
+            // 
+            // Time_Hours
+            // 
+            this.Time_Hours.Location = new System.Drawing.Point(162, 29);
+            this.Time_Hours.Name = "Time_Hours";
+            this.Time_Hours.Size = new System.Drawing.Size(43, 20);
+            this.Time_Hours.TabIndex = 9;
+            // 
+            // Time_Minutes
+            // 
+            this.Time_Minutes.Location = new System.Drawing.Point(229, 29);
+            this.Time_Minutes.Name = "Time_Minutes";
+            this.Time_Minutes.Size = new System.Drawing.Size(43, 20);
+            this.Time_Minutes.TabIndex = 10;
+            // 
             // Setup_Trip
             // 
             this.AcceptButton = this.setup_btn;
@@ -108,16 +124,20 @@
             this.CancelButton = this.cancel_btn;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.ControlBox = false;
+            this.Controls.Add(this.Time_Minutes);
+            this.Controls.Add(this.Time_Hours);
+            this.Controls.Add(this.Time_Txt);
             this.Controls.Add(this.TravelDelay);
             this.Controls.Add(this.Question2);
             this.Controls.Add(this.Question1);
-            this.Controls.Add(this.TravelTime);
             this.Controls.Add(this.setup_btn);
             this.Controls.Add(this.cancel_btn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Setup_Trip";
             this.Text = "Setup Trip";
+            ((System.ComponentModel.ISupportInitialize)(this.Time_Hours)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Time_Minutes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -127,9 +147,11 @@
 
         private System.Windows.Forms.Button cancel_btn;
         private System.Windows.Forms.Button setup_btn;
-        private System.Windows.Forms.DateTimePicker TravelTime;
         private System.Windows.Forms.Label Question1;
         private System.Windows.Forms.Label Question2;
         private System.Windows.Forms.DateTimePicker TravelDelay;
+        private System.Windows.Forms.Label Time_Txt;
+        private System.Windows.Forms.NumericUpDown Time_Hours;
+        private System.Windows.Forms.NumericUpDown Time_Minutes;
     }
 }

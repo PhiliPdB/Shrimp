@@ -208,7 +208,7 @@
             this.init_trip_btn.UseVisualStyleBackColor = true;
             this.init_trip_btn.Click += new System.EventHandler(this.init_trip_btn_Click);
             // 
-            // Form1
+            // Shrimp_Reader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -228,7 +228,7 @@
             this.Controls.Add(this.stop_btn);
             this.Controls.Add(this.start_btn);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "Form1";
+            this.Name = "Shrimp_Reader";
             this.Text = "Shrimp Reader";
             this.Click += new System.EventHandler(this.Form1_Click);
             ((System.ComponentModel.ISupportInitialize)(this.Temp_Graph)).EndInit();
