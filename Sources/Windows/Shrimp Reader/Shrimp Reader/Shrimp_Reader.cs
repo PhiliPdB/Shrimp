@@ -246,7 +246,7 @@ namespace Shrimp_Reader {
                         // check if the cursor is really close to the point (2 pixels around the point)
                         if (Math.Abs(pos.X - pointXPixel) < 2 &&
                             Math.Abs(pos.Y - pointYPixel) < 2) {
-                            tooltip.Show("X=" + prop.XValue + ", Temperature =" + prop.YValues[0] + "°C",
+                            tooltip.Show("X=" + prop.XValue + ", Temperature = " + prop.YValues[0] + "°C",
                                 this.Temp_Graph, pos.X, pos.Y - 15);
                         }
                     }
@@ -272,7 +272,7 @@ namespace Shrimp_Reader {
                         // check if the cursor is really close to the point (2 pixels around the point)
                         if (Math.Abs(pos.X - pointXPixel) < 2 &&
                             Math.Abs(pos.Y - pointYPixel) < 2) {
-                            tooltip.Show("X=" + prop.XValue + ", Humidity =" + prop.YValues[0] + "%",
+                            tooltip.Show("X=" + prop.XValue + ", Humidity = " + prop.YValues[0] + "%",
                                 this.Humidity_Graph, pos.X, pos.Y - 15);
                         }
                     }

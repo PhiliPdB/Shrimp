@@ -7,9 +7,9 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Shrimp Reader")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Simple program to read the Shrimp")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("PhiliPdB")]
 [assembly: AssemblyProduct("Shrimp Reader")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
@@ -18,7 +18,7 @@ using System.Resources;
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+[assembly: ComVisible(true)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("70601357-10fd-451f-a19f-74f066fab0e4")]
