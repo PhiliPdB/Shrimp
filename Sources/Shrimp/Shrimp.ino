@@ -111,10 +111,10 @@ void loop() {
             } else if (msg == "setTravelTime") setTravelTime();
             else if (msg == "viewAvgHumidity") {
                 calcAvgHumidity();
-                Serial.println(avgHumidity);
+                Serial.print("avgHumi: ");Serial.println(avgHumidity);
             } else if (msg == "viewAvgTemp") {
                 calcAvgTemp();
-                Serial.println(avgTemp);
+                Serial.print("avgTemp: ");Serial.println(avgTemp);
             } else if (msg == "clearData") clearData();
             else if (msg == "viewTemp") Temp();
             else if (msg == "viewHumi") Humi();

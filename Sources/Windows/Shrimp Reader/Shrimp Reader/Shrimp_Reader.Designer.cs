@@ -118,6 +118,7 @@
             this.Temp_Graph.Size = new System.Drawing.Size(388, 217);
             this.Temp_Graph.TabIndex = 7;
             this.Temp_Graph.Text = "chart1";
+            this.Temp_Graph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Temp_Graph_MouseMove);
             // 
             // Humidity_Graph
             // 
@@ -139,6 +140,7 @@
             this.Humidity_Graph.Size = new System.Drawing.Size(399, 217);
             this.Humidity_Graph.TabIndex = 8;
             this.Humidity_Graph.Text = "chart1";
+            this.Humidity_Graph.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Humidity_Graph_MouseMove);
             // 
             // humidity_title
             // 

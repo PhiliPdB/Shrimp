@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Shrimp_Reader {
     public partial class Shrimp_Reader : Form {
@@ -25,6 +26,9 @@ namespace Shrimp_Reader {
         private bool humiStarted = false;                   // Same as above, but for humidity
         private bool tempLogging = false;
         private bool humiLogging = false;
+
+        Point? prevPosition = null;
+        ToolTip tooltip = new ToolTip();
 
         public Shrimp_Reader() {
             InitializeComponent();
@@ -83,6 +87,8 @@ namespace Shrimp_Reader {
             humiLogging = true;
             myport.WriteLine("viewHumi");
             myport.WriteLine("viewTemp");
+            myport.WriteLine("viewAvgHumidity");
+            myport.WriteLine("viewAvgTemp");
         }
 
         public void init_Temp_Graph() {
@@ -122,6 +128,11 @@ namespace Shrimp_Reader {
             if (data.Equals("Start")) humiStarted = true;
         }
 
+        void getAverages(object sender, EventArgs e) {
+            if (data.Contains("avgHumi")) avg_humi.Text = data.Replace("avgHumi: ", "") + "%";
+            if (data.Contains("avgTemp")) avg_temp.Text = data.Replace("avgTemp: ", "") + "°C";
+        }
+
         void myport_DataReceived(object sender, SerialDataReceivedEventArgs e) {
             
             in_data = myport.ReadLine();
@@ -132,6 +143,8 @@ namespace Shrimp_Reader {
             // Initialize the graphs
             if (tempLogging && !humiLogging) this.Invoke(new EventHandler(getTemp));
             if (humiLogging && !tempLogging) this.Invoke(new EventHandler(getHumi));
+
+            if (data.Contains("avg")) this.Invoke(new EventHandler(getAverages));
         }
 
         private void displaydata_event(object sender, EventArgs e) {
@@ -213,6 +226,58 @@ namespace Shrimp_Reader {
         private void init_trip_btn_Click(object sender, EventArgs e) {
             myport.WriteLine("setTravelTime");
             setup_trip.ShowDialog();
+        }
+
+        // Display label when hovering temperature graph
+        void Temp_Graph_MouseMove(object sender, MouseEventArgs e) {
+            var pos = e.Location;
+            if (prevPosition.HasValue && pos == prevPosition.Value)
+                return;
+            tooltip.RemoveAll();
+            prevPosition = pos;
+            var results = Temp_Graph.HitTest(pos.X, pos.Y, false, ChartElementType.DataPoint);
+            foreach (var result in results) {
+                if (result.ChartElementType == ChartElementType.DataPoint) {
+                    var prop = result.Object as DataPoint;
+                    if (prop != null) {
+                        var pointXPixel = result.ChartArea.AxisX.ValueToPixelPosition(prop.XValue);
+                        var pointYPixel = result.ChartArea.AxisY.ValueToPixelPosition(prop.YValues[0]);
+
+                        // check if the cursor is really close to the point (2 pixels around the point)
+                        if (Math.Abs(pos.X - pointXPixel) < 2 &&
+                            Math.Abs(pos.Y - pointYPixel) < 2) {
+                            tooltip.Show("X=" + prop.XValue + ", Temperature =" + prop.YValues[0] + "°C",
+                                this.Temp_Graph, pos.X, pos.Y - 15);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Display label when hovering humidity graph
+        void Humidity_Graph_MouseMove(object sender, MouseEventArgs e) {
+            var pos = e.Location;
+            if (prevPosition.HasValue && pos == prevPosition.Value)
+                return;
+            tooltip.RemoveAll();
+            prevPosition = pos;
+            var results = Humidity_Graph.HitTest(pos.X, pos.Y, false, ChartElementType.DataPoint);
+            foreach (var result in results) {
+                if (result.ChartElementType == ChartElementType.DataPoint) {
+                    var prop = result.Object as DataPoint;
+                    if (prop != null) {
+                        var pointXPixel = result.ChartArea.AxisX.ValueToPixelPosition(prop.XValue);
+                        var pointYPixel = result.ChartArea.AxisY.ValueToPixelPosition(prop.YValues[0]);
+
+                        // check if the cursor is really close to the point (2 pixels around the point)
+                        if (Math.Abs(pos.X - pointXPixel) < 2 &&
+                            Math.Abs(pos.Y - pointYPixel) < 2) {
+                            tooltip.Show("X=" + prop.XValue + ", Humidity =" + prop.YValues[0] + "%",
+                                this.Humidity_Graph, pos.X, pos.Y - 15);
+                        }
+                    }
+                }
+            }
         }
     }
 }
