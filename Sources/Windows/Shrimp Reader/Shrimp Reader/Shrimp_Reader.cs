@@ -279,5 +279,14 @@ namespace Shrimp_Reader {
                 }
             }
         }
+
+        private void command_input_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\r')
+            {
+                myport.WriteLine(command_input.Text.Replace("\r", ""));
+                command_input.Text = "";
+            }
+        }
     }
 }

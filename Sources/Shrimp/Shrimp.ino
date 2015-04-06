@@ -203,7 +203,7 @@ void readDHT11() {
     EEPROM.write(addr, (int) DHT11.temperature);
     addr++;
     
-    EEPROMWriteInt(14, addr);
+    EEPROMWriteInt(16, addr);
 }
 
 void calcAvgHumidity() {

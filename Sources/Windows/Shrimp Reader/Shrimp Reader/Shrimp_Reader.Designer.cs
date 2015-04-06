@@ -47,6 +47,7 @@
             this.avg_temp_text = new System.Windows.Forms.Label();
             this.avg_temp = new System.Windows.Forms.Label();
             this.init_trip_btn = new System.Windows.Forms.Button();
+            this.command_input = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Temp_Graph)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Humidity_Graph)).BeginInit();
             this.SuspendLayout();
@@ -79,14 +80,18 @@
             this.save_btn.TabIndex = 2;
             this.save_btn.Text = "Save Data";
             this.save_btn.UseVisualStyleBackColor = true;
+            this.save_btn.Visible = false;
             this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
             // 
             // data_tb
             // 
+            this.data_tb.BackColor = System.Drawing.SystemColors.Window;
             this.data_tb.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.data_tb.HideSelection = false;
             this.data_tb.Location = new System.Drawing.Point(530, 321);
             this.data_tb.Multiline = true;
             this.data_tb.Name = "data_tb";
+            this.data_tb.ReadOnly = true;
             this.data_tb.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.data_tb.Size = new System.Drawing.Size(275, 212);
             this.data_tb.TabIndex = 3;
@@ -210,11 +215,22 @@
             this.init_trip_btn.UseVisualStyleBackColor = true;
             this.init_trip_btn.Click += new System.EventHandler(this.init_trip_btn_Click);
             // 
+            // command_input
+            // 
+            this.command_input.AcceptsReturn = true;
+            this.command_input.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.command_input.Location = new System.Drawing.Point(530, 542);
+            this.command_input.Name = "command_input";
+            this.command_input.Size = new System.Drawing.Size(275, 20);
+            this.command_input.TabIndex = 16;
+            this.command_input.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.command_input_KeyPress);
+            // 
             // Shrimp_Reader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(817, 545);
+            this.ClientSize = new System.Drawing.Size(817, 574);
+            this.Controls.Add(this.command_input);
             this.Controls.Add(this.init_trip_btn);
             this.Controls.Add(this.avg_temp);
             this.Controls.Add(this.avg_temp_text);
@@ -256,6 +272,7 @@
         private System.Windows.Forms.Label avg_temp_text;
         private System.Windows.Forms.Label avg_temp;
         private System.Windows.Forms.Button init_trip_btn;
+        private System.Windows.Forms.TextBox command_input;
     }
 }
 
