@@ -1,22 +1,21 @@
 //
 //     FILE: Shrimp.ino
 //   AUTHOR: Philip de Bruin
-//  VERSION: 0.1
+//  VERSION: 1.1
 //  PURPOSE: For school assesment
-//
 //
 
 #include "Arduino.h"
 
-// Include temperature and humidity sensor library
-#include <dht11.h>
+// Include temperature sensor library
+#include <OneWire.h>
+#include <DallasTemperature.h>
 // Include libraries for database
 #include <EEPROM.h>
 #include <String.h>
 
 // Pins
-//const int ledPin = 13;
-const int dht11Pin = 8;
+const int TemperatureSensorPin = 8;
 
 // Variables to use for the interval
 unsigned long previousMillis = 0;
@@ -25,15 +24,17 @@ unsigned long logDelay = 0;                       // Log delay in milliseconds
 int logInterval = 0;                             // Log interval in milliseconds
 
 // Variables
-dht11 DHT11;
+OneWire ds(TemperatureSensorPin);
+DallasTemperature sensors(&ds);
+
 long travelTime; // Total travel time in s
 boolean travelTimeSet = false;
 int maxLogs = 503;
 String msg;
 boolean logData = false;
+char buffer[25];
 
-int avgHumidity;
-int avgTemp;
+double avgTemp;
 
 int addr = 18;
 
@@ -80,6 +81,59 @@ unsigned int EEPROMReadInt(int address) {
      return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
 }
 
+void scanSensors(void) {
+  byte i;
+  byte present = 0;
+  byte data[12];
+  byte addr[8];
+  while (ds.search(addr)) {
+    Serial.print("R=");
+    for( i = 0; i < 8; i++) {
+      Serial.print(addr[i], HEX);
+      Serial.print(" ");
+    }
+  
+    if ( OneWire::crc8( addr, 7) != addr[7]) {
+        Serial.print("CRC is not valid!\n");
+        return;
+    }
+    
+    if ( addr[0] == 0x10) {
+        Serial.print("Device is a DS18S20 family device.\n");
+    } else {
+        Serial.print("Device is unknown!\n");
+        Serial.print("Device ID: ");
+        Serial.print(addr[0],HEX);
+        Serial.println();
+        return;
+      }
+    
+    // The DallasTemperature library can do all this work for you!
+    ds.reset();
+    ds.select(addr);
+    ds.write(0x44,1);         // start conversion, with parasite power on at the end
+    delay(1000);     // maybe 750ms is enough, maybe not
+    // we might do a ds.depower() here, but the reset will take care of it.
+    present = ds.reset();
+    ds.select(addr);    
+    ds.write(0xBE);         // Read Scratchpad
+    Serial.print("P=");
+    Serial.print(present,HEX);
+    Serial.print("  ");
+    for ( i = 0; i < 9; i++) {           // we need 9 bytes
+      data[i] = ds.read();
+      Serial.print(data[i], HEX);
+      Serial.print(" ");
+    }
+    Serial.print(" CRC=");
+    Serial.print( OneWire::crc8( data, 8), HEX);
+    Serial.println();
+  }
+  Serial.print("No more addresses.\n");
+  ds.reset_search();
+  delay(250);
+}
+
 void setup() {
     if (EEPROMReadInt(0)) logInterval = (int) EEPROMReadInt(0);
     if (EEPROM.read(2)) logData = (boolean) EEPROM.read(2);
@@ -87,12 +141,14 @@ void setup() {
     if (EEPROM.read(7)) travelTimeSet = (boolean) EEPROM.read(7);
     if (EEPROMReadlong(8)) logDelay = (int) EEPROMReadInt(8);
     if (EEPROMReadlong(12)) travelTime = (long) EEPROMReadlong(10);
-    if (EEPROMReadInt(16)) addr = (int) EEPROMReadInt(14);
+    if (EEPROMReadInt(16)) addr = (int) EEPROMReadInt(16);
     
     if (logInterval <= 1000) logData = false;
     
-    DHT11.attach(dht11Pin);
     Serial.begin(9600);
+    
+    sensors.begin();
+    scanSensors();
 }
 
 void loop() {
@@ -109,15 +165,11 @@ void loop() {
                 Serial.println("Stopping with logging data");
                 logData = false;
             } else if (msg == "setTravelTime") setTravelTime();
-            else if (msg == "viewAvgHumidity") {
-                calcAvgHumidity();
-                Serial.print("avgHumi: ");Serial.println(avgHumidity);
-            } else if (msg == "viewAvgTemp") {
+            else if (msg == "viewAvgTemp") {
                 calcAvgTemp();
-                Serial.print("avgTemp: ");Serial.println(avgTemp);
+                Serial.print("avgTemp: "); Serial.println(avgTemp);
             } else if (msg == "clearData") clearData();
             else if (msg == "viewTemp") Temp();
-            else if (msg == "viewHumi") Humi();
             else if (msg == "addr") Serial.println(addr);
             
             msg = "";
@@ -127,10 +179,10 @@ void loop() {
   
     unsigned long currentMillis = millis();
   
-    if (currentMillis - previousMillis >= logInterval * 1000 && logData && addr % 2 == 0 && addr < 1024) {
+    if (currentMillis - previousMillis >= logInterval * 1000 && logData && addr < 1024) {
         previousMillis = currentMillis;
       
-        readDHT11();
+        readTempSensor();
     }
     
     if (travelTimeSet && currentMillis - previousLogMillis >= logDelay) {
@@ -139,24 +191,20 @@ void loop() {
 }
 
 void readData() {
-    int y = 1;
     Serial.println("-----");
-    for (int i = 18; i < addr; i++) {
-        int x = (int) EEPROM.read(i);
-        if (i % 2 == 0) {
-            Serial.print("Recnum: "); Serial.println(y);
-            Serial.print("Humidity: "); Serial.println(x);
-            y++;
-        } else if (i % 2 != 0) {
-            Serial.print("Temperature: "); Serial.println(x);
-            Serial.println("-----");
-        } 
+    for (int i = 18; i < addr; i+=2) {
+        double x = (EEPROMReadInt(i) / 100);
+        Serial.print("Temperature: ");
+        Serial.print(x, 2);
+        Serial.println("°C");
     } 
 }
 
 void clearData() {
     for ( int i = 0 ; i < 1024 ; i++ ) EEPROM.write(i, 0);
+    logData = false;
     addr = 18;
+    EEPROMWriteInt(16, addr);
     Serial.println("Data succesfully cleared");
 }
 
@@ -185,61 +233,29 @@ void setLogInterval() {
     EEPROM.write(2,logData);
 }
 
-void readDHT11() {
-    int chk = DHT11.read();
-//    switch (chk) {
-//        case 0: Serial.println("OK"); break;
-//        case -1: Serial.println("Checksum error"); break;
-//        case -2: Serial.println("Time out error"); break;
-//        default: Serial.println("Unknown error"); break;
-//     }
+void readTempSensor() {
+    sensors.requestTemperatures();
+    double temp = sensors.getTempCByIndex(0);
+    EEPROMWriteInt(addr, (int) (temp * 100));
     
-//      Serial.print("Humidity (%): ");
-//      Serial.println((int) DHT11.humidity, DEC);
-    EEPROM.write(addr, (int) DHT11.humidity);
-    addr++;
-//      Serial.print("Temperature (°C): ");
-//      Serial.println((double) DHT11.temperature, DEC);
-    EEPROM.write(addr, (int) DHT11.temperature);
-    addr++;
+    addr += 2;
     
     EEPROMWriteInt(16, addr);
 }
 
-void calcAvgHumidity() {
-    int totalHumidity = 0;
-    int cases = 0;
-    for (int i = 18; i < addr; i++) {
-        if (i % 2 == 0) {
-            totalHumidity += (int) EEPROM.read(i);
-            cases++;
-        }
-    }
-    avgHumidity = totalHumidity / cases;
-}
-
 void calcAvgTemp() {
-    int totalTemp = 0;
+    double totalTemp = 0;
     int cases = 0;
-    for (int i = 18; i < addr; i++) {
-        if (i % 2 != 0) {
-            totalTemp += (int) EEPROM.read(i);
-            cases++;
-        }
+    for (int i = 18; i < addr; i+=2) {
+        totalTemp += ((double) EEPROMReadInt(i) / 100);
+        cases++;
     }
     avgTemp = totalTemp / cases;
 }
 
-void Humi() {
-    Serial.println("Start");
-    for (int i = 18; i < addr; i++)
-        if (i % 2 == 0) Serial.println(EEPROM.read(i), DEC);
-    Serial.println("End");
-}
-
 void Temp() {
     Serial.println("Start");
-    for (int i = 18; i < addr; i++)
-        if (i % 2 != 0) Serial.println(EEPROM.read(i), DEC);
+    for (int i = 18; i < addr; i+=2)
+        Serial.println(((double) EEPROMReadInt(i) / 100), 2);
     Serial.println("End");
 }

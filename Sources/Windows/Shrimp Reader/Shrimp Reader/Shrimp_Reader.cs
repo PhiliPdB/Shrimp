@@ -19,13 +19,10 @@ namespace Shrimp_Reader {
         private string in_data;                             // Data in save string
         private string data;                                // in_data string without the \r
         private static string port;                         // Serial port name
-        private List<int> temperature = new List<int>();    // Temperatures over time
-        private List<int> humidity = new List<int>();       // Humidities over time
+        private List<double> temperature = new List<double>();    // Temperatures over time
 
         private bool tempStarted = false;                   // If temp logging is started the boolean is true
-        private bool humiStarted = false;                   // Same as above, but for humidity
         private bool tempLogging = false;
-        private bool humiLogging = false;
 
         Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
@@ -80,14 +77,10 @@ namespace Shrimp_Reader {
 
         public void getData() {
             Temp_Graph.Series["Series1"].Points.Clear();
-            Humidity_Graph.Series["Series1"].Points.Clear();
             temperature.Clear();
-            humidity.Clear();
 
-            humiLogging = true;
-            myport.WriteLine("viewHumi");
+            tempLogging = true;
             myport.WriteLine("viewTemp");
-            myport.WriteLine("viewAvgHumidity");
             myport.WriteLine("viewAvgTemp");
         }
 
@@ -104,32 +97,12 @@ namespace Shrimp_Reader {
                 init_Temp_Graph();
             }
             
-            if (tempStarted && !humiStarted) temperature.Add(int.Parse(data));
+            if (tempStarted) temperature.Add(double.Parse(data));
 
             if (data.Equals("Start")) tempStarted = true;
         }
 
-        public void init_Humi_Graph() {
-            for (int i = 0; i < humidity.Count; i++) {
-                Humidity_Graph.Series["Series1"].Points.AddXY(i, humidity[i]);
-            }
-        }
-
-        void getHumi(object sender, EventArgs e) {
-            if (data.Equals("End")) {
-                humiStarted = false;
-                humiLogging = false;
-                tempLogging = true;
-                init_Humi_Graph();
-            }
-
-            if (!tempStarted && humiStarted) humidity.Add(int.Parse(data));
-
-            if (data.Equals("Start")) humiStarted = true;
-        }
-
         void getAverages(object sender, EventArgs e) {
-            if (data.Contains("avgHumi")) avg_humi.Text = data.Replace("avgHumi: ", "") + "%";
             if (data.Contains("avgTemp")) avg_temp.Text = data.Replace("avgTemp: ", "") + "°C";
         }
 
@@ -137,18 +110,11 @@ namespace Shrimp_Reader {
             
             in_data = myport.ReadLine();
             data = in_data.Replace("\r", "");
-            
-            // Displays what the Shrimp sends
-            this.Invoke(new EventHandler(displaydata_event));
+
             // Initialize the graphs
-            if (tempLogging && !humiLogging) this.Invoke(new EventHandler(getTemp));
-            if (humiLogging && !tempLogging) this.Invoke(new EventHandler(getHumi));
+            if (tempLogging) this.Invoke(new EventHandler(getTemp));
 
             if (data.Contains("avg")) this.Invoke(new EventHandler(getAverages));
-        }
-
-        private void displaydata_event(object sender, EventArgs e) {
-            data_tb.AppendText(in_data + "\n");
         }
 
         private void stop_btn_click(object sender, EventArgs e) {
@@ -156,33 +122,6 @@ namespace Shrimp_Reader {
                 myport.WriteLine("clearData");
             } catch (Exception ex2) {
                 MessageBox.Show(ex2.Message, "Error");
-            }
-        }
-
-        private void save_btn_Click(object sender, EventArgs e) {
-            Stream fileStream;
-            // Configure save file dialog box
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.FileName = "ShrimpData"; // Default file name
-            sfd.DefaultExt = ".txt"; // Default file extension
-            sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"; // Filter files by extension
-            sfd.FilterIndex = 2;
-            sfd.RestoreDirectory = true;
-
-            // Show save file dialog box
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {
-                if ((fileStream = sfd.OpenFile()) != null)
-                {
-                    // Code to convert the textbox to bytes.
-                    byte[] byteArray = Encoding.UTF8.GetBytes(data_tb.Text);
-                    MemoryStream data = new MemoryStream(byteArray);
-
-                    // Code to save the file.
-                    data.Position = 0;
-                    data.WriteTo(fileStream);
-                    fileStream.Close();
-                }
             }
         }
 
@@ -251,41 +190,6 @@ namespace Shrimp_Reader {
                         }
                     }
                 }
-            }
-        }
-
-        // Display label when hovering humidity graph
-        void Humidity_Graph_MouseMove(object sender, MouseEventArgs e) {
-            var pos = e.Location;
-            if (prevPosition.HasValue && pos == prevPosition.Value)
-                return;
-            tooltip.RemoveAll();
-            prevPosition = pos;
-            var results = Humidity_Graph.HitTest(pos.X, pos.Y, false, ChartElementType.DataPoint);
-            foreach (var result in results) {
-                if (result.ChartElementType == ChartElementType.DataPoint) {
-                    var prop = result.Object as DataPoint;
-                    if (prop != null) {
-                        var pointXPixel = result.ChartArea.AxisX.ValueToPixelPosition(prop.XValue);
-                        var pointYPixel = result.ChartArea.AxisY.ValueToPixelPosition(prop.YValues[0]);
-
-                        // check if the cursor is really close to the point (2 pixels around the point)
-                        if (Math.Abs(pos.X - pointXPixel) < 2 &&
-                            Math.Abs(pos.Y - pointYPixel) < 2) {
-                            tooltip.Show("X=" + prop.XValue + ", Humidity = " + prop.YValues[0] + "%",
-                                this.Humidity_Graph, pos.X, pos.Y - 15);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void command_input_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '\r')
-            {
-                myport.WriteLine(command_input.Text.Replace("\r", ""));
-                command_input.Text = "";
             }
         }
     }
