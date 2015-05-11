@@ -1,3 +1,3 @@
 # Shrimp
 
-Project voor school...
+Assesment for school to make a shrimp that can measure temperature.
