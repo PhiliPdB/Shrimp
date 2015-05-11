@@ -15,13 +15,13 @@ namespace Shrimp_Reader {
     public partial class Shrimp_Reader : Form {
 
         private Form setup_trip = new Setup_Trip();
-        public static SerialPort myport;                    // Serial port
-        private string in_data;                             // Data in save string
-        private string data;                                // in_data string without the \r
-        private static string port;                         // Serial port name
-        private List<double> temperature = new List<double>();    // Temperatures over time
+        public static SerialPort myport;                            // Serial port
+        private string in_data;                                     // Data in save string
+        private string data;                                        // in_data string without the \r
+        private static string port;                                 // Serial port name
+        private List<double> temperature = new List<double>();      // Temperatures over time
 
-        private bool tempStarted = false;                   // If temp logging is started the boolean is true
+        private bool tempStarted = false;                           // If temp logging is started the boolean is true
         private bool tempLogging = false;
 
         Point? prevPosition = null;
@@ -93,7 +93,7 @@ namespace Shrimp_Reader {
                 init_Temp_Graph();
             }
             
-            if (tempStarted) temperature.Add(double.Parse(data) / 100);
+            if (tempStarted) temperature.Add(double.Parse(data));
 
             if (data.Equals("Start")) tempStarted = true;
         }
