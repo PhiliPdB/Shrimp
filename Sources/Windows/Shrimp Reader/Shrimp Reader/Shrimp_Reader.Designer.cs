@@ -146,7 +146,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Shrimp_Reader";
             this.Text = "Shrimp Reader";
-            this.Click += new System.EventHandler(this.Form1_Click);
             ((System.ComponentModel.ISupportInitialize)(this.Temp_Graph)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

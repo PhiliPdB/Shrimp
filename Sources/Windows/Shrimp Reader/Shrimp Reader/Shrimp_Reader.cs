@@ -54,10 +54,6 @@ namespace Shrimp_Reader {
             }
         }
 
-        private void Form1_Click(object sender, EventArgs e) {
-
-        }
-
         private void start_btn_Click(object sender, EventArgs e) {
             if (!myport.IsOpen) {
                 try {
@@ -97,7 +93,7 @@ namespace Shrimp_Reader {
                 init_Temp_Graph();
             }
             
-            if (tempStarted) temperature.Add(double.Parse(data));
+            if (tempStarted) temperature.Add(double.Parse(data) / 100);
 
             if (data.Equals("Start")) tempStarted = true;
         }
