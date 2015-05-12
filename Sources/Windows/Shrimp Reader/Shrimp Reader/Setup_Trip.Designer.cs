@@ -68,9 +68,9 @@
             this.Question1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Question1.Location = new System.Drawing.Point(9, 9);
             this.Question1.Name = "Question1";
-            this.Question1.Size = new System.Drawing.Size(243, 17);
+            this.Question1.Size = new System.Drawing.Size(271, 17);
             this.Question1.TabIndex = 5;
-            this.Question1.Text = "How long takes the journey? (hh:mm)";
+            this.Question1.Text = "How long does the journey take? (hh:mm)";
             // 
             // Question2
             // 
@@ -78,9 +78,9 @@
             this.Question2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Question2.Location = new System.Drawing.Point(9, 67);
             this.Question2.Name = "Question2";
-            this.Question2.Size = new System.Drawing.Size(259, 17);
+            this.Question2.Size = new System.Drawing.Size(231, 17);
             this.Question2.TabIndex = 6;
-            this.Question2.Text = "When do you want to start with logging?";
+            this.Question2.Text = "When do you want to start logging?";
             // 
             // TravelDelay
             // 
